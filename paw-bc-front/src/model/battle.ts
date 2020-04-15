@@ -3,11 +3,22 @@ import {Unit, UnitPath, unitPathsEq} from "model/army";
 export interface Battle {
     id: number;
     place: string;
+    tactic: {
+        rovania: BattleTactic;
+        brander: BattleTactic;
+    }
 
     units: {
         rovania: UnitPath[];
         brander: UnitPath[];
     }
+}
+
+export enum BattleTactic {
+    skirmish = 'Перестрелка',
+    firefight = 'Огневой бой',
+    columnAttack = 'Атака колоннами',
+    square = 'Каре'
 }
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {

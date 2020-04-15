@@ -7,6 +7,7 @@ import {RootState} from "redux/rootReducer";
 import {Battle} from "model/battle";
 import {BattlesState, addBattle} from "redux/slicers/battles";
 import { FaPlus } from "react-icons/fa";
+import BattleCard from "./BattleCard";
 
 interface CalcPageProps {
     battle: Battle;
@@ -38,6 +39,15 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                 </Col>
                 <Col md={6}>
                     <ArmyCard party="brander"/>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={6}>
+                    <BattleCard party="rovania"/>
+                </Col>
+                <Col md={6}>
+                    <BattleCard party="brander"/>
                 </Col>
             </Row>
         </>

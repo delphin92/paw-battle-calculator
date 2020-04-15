@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Battle} from "model/battle";
+import {Battle, BattleTactic} from "model/battle";
 import {Unit, unitPathsEq} from "model/army";
 
 export interface BattlesState {
@@ -7,29 +7,28 @@ export interface BattlesState {
     nextBattleId: number;
 }
 
+const newBattle = (id: number): Battle => ({
+    id,
+    place: 'Битва ' + id,
+    tactic: {
+        rovania: BattleTactic.skirmish,
+        brander: BattleTactic.skirmish
+    },
+    units: {
+        rovania: [],
+        brander: []
+    }
+})
+
 const battles = createSlice({
     name: 'battles',
     initialState: {
-        battles: [{
-            id: 0,
-            place: 'Битва 0',
-            units: {
-                rovania: [],
-                brander: []
-            }
-        }],
+        battles: [newBattle(0)],
         nextBattleId: 0
     } as BattlesState,
     reducers: {
         addBattle: state => {
-            state.battles.push({
-                id: state.nextBattleId,
-                place: 'Битва ' + state.nextBattleId,
-                units: {
-                    rovania: [],
-                    brander: []
-                }
-            });
+            state.battles.push(newBattle(state.nextBattleId));
 
             state.nextBattleId += 1;
         },
@@ -51,12 +50,16 @@ const battles = createSlice({
                 const unitIndex = party.findIndex(path => unitPathsEq(path, unit.path));
                 party.splice(unitIndex);
             }
+        },
+
+        setBattleTactic: (state, {payload: {battleIndex, party, tactic}}: PayloadAction<{battleIndex: number, party: 'rovania' | 'brander', tactic: BattleTactic}>) => {
+            state.battles[battleIndex].tactic[party] = tactic;
         }
     }
 });
 
 /****** EXPORT ******/
 
-export const {addUnitToBattle, removeUnitFromBattle, addBattle} = battles.actions;
+export const {addUnitToBattle, removeUnitFromBattle, addBattle, setBattleTactic} = battles.actions;
 
 export default battles.reducer;
