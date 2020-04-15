@@ -3,15 +3,14 @@ import {Unit, UnitPath, unitPathsEq} from "model/army";
 export interface Battle {
     id: number;
     place: string;
-    tactic: {
-        rovania: BattleTactic;
-        brander: BattleTactic;
-    }
 
-    units: {
-        rovania: UnitPath[];
-        brander: UnitPath[];
-    }
+    rovania: BattleParty;
+    brander: BattleParty;
+}
+
+export interface BattleParty {
+    tactic: BattleTactic;
+    units: UnitPath[];
 }
 
 export enum BattleTactic {
@@ -22,7 +21,7 @@ export enum BattleTactic {
 }
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {
-    const party = unit.path[0] === 0 ? battle.units.rovania : battle.units.brander;
+    const party = unit.path[0] === 0 ? battle.rovania.units : battle.brander.units;
     const unitIndex = party.findIndex(path => unitPathsEq(path, unit.path));
     return unitIndex >= 0;
 }

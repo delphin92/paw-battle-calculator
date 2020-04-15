@@ -3,8 +3,8 @@ import {Card, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
-import {Battle, BattleTactic} from "model/battle";
-import {Unit, UnitPath} from "model/army";
+import {Battle, BattleParty, BattleTactic} from "model/battle";
+import {Unit} from "model/army";
 import {removeUnitFromBattle, setBattleTactic} from "redux/slicers/battles";
 
 interface BattleCardProps {
@@ -13,8 +13,7 @@ interface BattleCardProps {
 
 interface BattleCardState {
     battle: Battle;
-    units: UnitPath[];
-    tactic: BattleTactic;
+    battleParty: BattleParty;
 }
 
 interface BattleCardDispatched {
@@ -22,10 +21,10 @@ interface BattleCardDispatched {
     removeUnitFromBattle: (unit: Unit) => void;
 }
 
-const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({tactic, setBattleTactic}) => (
+const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => (
     <Card>
         <Card.Body>
-            <ToggleButtonGroup type="radio" name="tactic" value={tactic} onChange={setBattleTactic}>
+            <ToggleButtonGroup type="radio" name="tactic" value={battleParty.tactic} onChange={setBattleTactic}>
                 <ToggleButton value={BattleTactic.skirmish}>{BattleTactic.skirmish}</ToggleButton>
                 <ToggleButton value={BattleTactic.firefight}>{BattleTactic.firefight}</ToggleButton>
                 <ToggleButton value={BattleTactic.columnAttack}>{BattleTactic.columnAttack}</ToggleButton>
@@ -39,8 +38,7 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
 export default withRouter(connect(
     (state: RootState, {party, match: {params}}: BattleCardProps & RouteComponentProps<{battleIndex: string}>) => ({
         battle: state.battles.battles[parseInt(params.battleIndex)],
-        units: state.battles.battles[parseInt(params.battleIndex)].units[party],
-        tactic: state.battles.battles[parseInt(params.battleIndex)].tactic[party]
+        battleParty: state.battles.battles[parseInt(params.battleIndex)][party]
     }),
     (dispatch, {party, match: {params: {battleIndex}}}) => ({
         setBattleTactic: (tactic: BattleTactic) => dispatch(setBattleTactic({tactic, party, battleIndex: parseInt(battleIndex)})),

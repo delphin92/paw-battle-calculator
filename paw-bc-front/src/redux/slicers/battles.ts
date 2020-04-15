@@ -10,13 +10,13 @@ export interface BattlesState {
 const newBattle = (id: number): Battle => ({
     id,
     place: 'Битва ' + id,
-    tactic: {
-        rovania: BattleTactic.skirmish,
-        brander: BattleTactic.skirmish
+    rovania: {
+        tactic: BattleTactic.skirmish,
+        units: []
     },
-    units: {
-        rovania: [],
-        brander: []
+    brander: {
+        tactic: BattleTactic.skirmish,
+        units: []
     }
 })
 
@@ -24,7 +24,7 @@ const battles = createSlice({
     name: 'battles',
     initialState: {
         battles: [newBattle(0)],
-        nextBattleId: 0
+        nextBattleId: 1
     } as BattlesState,
     reducers: {
         addBattle: state => {
@@ -37,8 +37,8 @@ const battles = createSlice({
             const battle = state.battles[battleIndex];
 
             if (battle) {
-                const party = unit.path[0] === 0 ? battle.units.rovania : battle.units.brander;
-                party.push(unit.path);
+                const units = unit.path[0] === 0 ? battle.rovania.units : battle.brander.units;
+                units.push(unit.path);
             }
         },
 
@@ -46,14 +46,14 @@ const battles = createSlice({
             const battle = state.battles[battleIndex];
 
             if (battle) {
-                const party = unit.path[0] === 0 ? battle.units.rovania : battle.units.brander;
-                const unitIndex = party.findIndex(path => unitPathsEq(path, unit.path));
-                party.splice(unitIndex);
+                const units = unit.path[0] === 0 ? battle.rovania.units : battle.brander.units;
+                const unitIndex = units.findIndex(path => unitPathsEq(path, unit.path));
+                units.splice(unitIndex, 1);
             }
         },
 
         setBattleTactic: (state, {payload: {battleIndex, party, tactic}}: PayloadAction<{battleIndex: number, party: 'rovania' | 'brander', tactic: BattleTactic}>) => {
-            state.battles[battleIndex].tactic[party] = tactic;
+            state.battles[battleIndex][party].tactic = tactic;
         }
     }
 });
