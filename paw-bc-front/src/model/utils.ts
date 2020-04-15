@@ -1,0 +1,1 @@
+export type OneArgFunction<T, V> = (a: T) => V;

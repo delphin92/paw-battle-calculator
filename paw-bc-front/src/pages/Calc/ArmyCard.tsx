@@ -1,7 +1,6 @@
 import React from "react";
 import {Card} from "react-bootstrap";
 import ArmyTree from "components/ArmyTree/ArmyTree";
-import {armies} from "data/army";
 
 interface ArmyCardProps {
     party: 'rovania' | 'brander'
@@ -10,7 +9,7 @@ interface ArmyCardProps {
 const ArmyCard: React.FC<ArmyCardProps> = ({party}) => (
     <Card>
         <Card.Body>
-            <ArmyTree army={armies[party]}/>
+            <ArmyTree party={party}/>
         </Card.Body>
     </Card>
 );

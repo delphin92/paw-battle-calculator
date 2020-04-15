@@ -12,7 +12,7 @@ function App() {
 
         <Container>
             <Switch>
-                <Route path="/calc" component={CalcPage}/>
+                <Route path="/calc/:battleIndex?" component={CalcPage}/>
             </Switch>
         </Container>
     </div>

@@ -3,28 +3,56 @@ import {FaMinus, FaPlus} from "react-icons/all";
 import {Army, Unit} from "model/army";
 import {Collapse, ListGroup} from "react-bootstrap";
 import "./ArmyTree.scss";
+import {connect} from "react-redux";
+import {RootState} from "redux/rootReducer";
+import {Battle, isUnitInBattle} from "model/battle";
+import {addUnitToBattle, removeUnitFromBattle} from "redux/slicers/battles";
+import {RouteComponentProps, withRouter} from "react-router-dom";
 
 interface ArmyTreeProps {
+    party: 'rovania' | 'brander'
+}
+
+interface ArmyTreeState {
     army: Army;
+    battle: Battle;
+}
+
+interface ArmyTreeDispatched {
+    addUnitToBattle: (unit: Unit) => void;
+    removeUnitFromBattle: (unit: Unit) => void;
 }
 
 interface ArmyTreeNodeProps {
     unit: Unit;
     depth: number;
+
+    battle: Battle;
+    addUnitToBattle: (unit: Unit) => void;
+    removeUnitFromBattle: (unit: Unit) => void;
 }
 
-const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth}) => {
+const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, ...otherProps}) => {
     const [isExpanded, setExpanded] = useState(false);
+    const {battle, addUnitToBattle, removeUnitFromBattle} = otherProps;
+
+    const toggleExpanded = (e: any) => {
+        setExpanded(!isExpanded);
+        e.stopPropagation();
+    }
+
+    const isActive = isUnitInBattle(battle, unit);
+    const toggleSelection = () => isActive ? removeUnitFromBattle(unit) : addUnitToBattle(unit);
 
     return (
         <>
-            <ListGroup.Item>
-                {[...new Array(depth)].map(() => <span className="depth-filler"/>)}
+            <ListGroup.Item active={isActive} onClick={toggleSelection}>
+                {[...new Array(depth)].map((_, i) => <span key={i} className="depth-filler"/>)}
                 {unit.subunits ?
                     isExpanded ?
-                        <FaMinus onClick={() => setExpanded(false)}/>
+                        <FaMinus onClick={toggleExpanded}/>
                     :
-                        <FaPlus onClick={() => setExpanded(true)}/>
+                        <FaPlus onClick={toggleExpanded}/>
 
                 :
                     <span className="expand-button-filler"/>
@@ -35,7 +63,7 @@ const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth}) => {
                 <Collapse in={isExpanded}>
                     <div>
                         {unit.subunits.map((unit, index) =>
-                            <ArmyTreeNode key={index} unit={unit} depth={depth + 1}/>
+                            <ArmyTreeNode key={index} unit={unit} depth={depth + 1} {...otherProps}/>
                         )}
                     </div>
                 </Collapse>
@@ -44,12 +72,21 @@ const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth}) => {
     );
 }
 
-const ArmyTree: React.FC<ArmyTreeProps> = ({army}) => (
+const ArmyTree: React.FC<ArmyTreeProps & ArmyTreeState & ArmyTreeDispatched> = ({army, ...otherProps}) => (
     <ListGroup className="army-tree">
         {army.units.map((unit, index) =>
-            <ArmyTreeNode key={index} unit={unit} depth={0}/>
+            <ArmyTreeNode key={index} unit={unit} depth={0} {...otherProps}/>
         )}
     </ListGroup>
 );
 
-export default ArmyTree;
+export default withRouter(connect(
+    (state: RootState, {party, match: {params}}: ArmyTreeProps & RouteComponentProps<{battleIndex: string}>) => ({
+        army: state.armiesState.armies[party],
+        battle: state.battles.battles[parseInt(params.battleIndex)] as Battle
+    }),
+    (dispatch, {match: {params: {battleIndex}}}) => ({
+        addUnitToBattle: (unit: Unit) => dispatch(addUnitToBattle({unit, battleIndex: parseInt(battleIndex)})),
+        removeUnitFromBattle: (unit: Unit) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
+    })
+)(ArmyTree));

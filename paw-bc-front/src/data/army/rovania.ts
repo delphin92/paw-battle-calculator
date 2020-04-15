@@ -1,8 +1,9 @@
 import {Army} from "model/army";
+import {prepareUnits} from "data/army/utils";
 
 const army: Army = {
     name: 'Армия Рованской Республики',
-    units: [{
+    units: prepareUnits(0, [{
         name: '1-й пехотный корпус',
         commanderName: 'Жозес де Вон',
         subunits: [{
@@ -37,7 +38,7 @@ const army: Army = {
     }, {
         name: '1-й кавалерийский корпус',
         commanderName: 'Жан Койтон',
-    }]
+    }])
 };
 
 export default army;
