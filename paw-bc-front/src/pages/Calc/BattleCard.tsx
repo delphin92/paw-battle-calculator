@@ -3,8 +3,8 @@ import {Card, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
-import {Battle, BattleParty, BattleTactic} from "model/battle";
-import {Unit} from "model/army";
+import {Battle, BattleParty, InfantryTactic, Tactic} from "model/battle";
+import {Unit, UnitType} from "model/army";
 import {removeUnitFromBattle, setBattleTactic} from "redux/slicers/battles";
 
 interface BattleCardProps {
@@ -17,23 +17,30 @@ interface BattleCardState {
 }
 
 interface BattleCardDispatched {
-    setBattleTactic: (tactic: BattleTactic) => void;
+    setBattleTactic: (unitType: UnitType, tactic: Tactic) => void;
     removeUnitFromBattle: (unit: Unit) => void;
 }
 
-const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => (
-    <Card>
-        <Card.Body>
-            <ToggleButtonGroup type="radio" name="tactic" value={battleParty.tactic} onChange={setBattleTactic}>
-                <ToggleButton value={BattleTactic.skirmish}>{BattleTactic.skirmish}</ToggleButton>
-                <ToggleButton value={BattleTactic.firefight}>{BattleTactic.firefight}</ToggleButton>
-                <ToggleButton value={BattleTactic.columnAttack}>{BattleTactic.columnAttack}</ToggleButton>
-                <ToggleButton value={BattleTactic.square}>{BattleTactic.square}</ToggleButton>
-            </ToggleButtonGroup>
+const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => {
+    const setInfantryTactic = (tactic: Tactic) => setBattleTactic(UnitType.infantry, tactic);
 
-        </Card.Body>
-    </Card>
-);
+    return (
+        <Card>
+            <Card.Body>
+                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                                   value={battleParty[UnitType.infantry].tactic}
+                                   onChange={setInfantryTactic}
+                >
+                    <ToggleButton value={InfantryTactic.skirmish}>{InfantryTactic.skirmish}</ToggleButton>
+                    <ToggleButton value={InfantryTactic.firefight}>{InfantryTactic.firefight}</ToggleButton>
+                    <ToggleButton value={InfantryTactic.columnAttack}>{InfantryTactic.columnAttack}</ToggleButton>
+                    <ToggleButton value={InfantryTactic.square}>{InfantryTactic.square}</ToggleButton>
+                </ToggleButtonGroup>
+
+            </Card.Body>
+        </Card>
+    );
+};
 
 export default withRouter(connect(
     (state: RootState, {party, match: {params}}: BattleCardProps & RouteComponentProps<{battleIndex: string}>) => ({
@@ -41,7 +48,7 @@ export default withRouter(connect(
         battleParty: state.battles.battles[parseInt(params.battleIndex)][party]
     }),
     (dispatch, {party, match: {params: {battleIndex}}}) => ({
-        setBattleTactic: (tactic: BattleTactic) => dispatch(setBattleTactic({tactic, party, battleIndex: parseInt(battleIndex)})),
+        setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)})),
         removeUnitFromBattle: (unit: Unit) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleCard));

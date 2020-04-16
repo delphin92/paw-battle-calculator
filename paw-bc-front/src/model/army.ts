@@ -1,8 +1,12 @@
+import {InfantryTactic} from "model/battle";
+
 export interface Army {
     name: string;
 
     units: Unit[];
 }
+
+export type Party = 'rovania' | 'brander';
 
 export interface Armies {
     rovania: Army;
@@ -15,6 +19,21 @@ export const partyToIndex = {
 }
 
 export type UnitPath = number[];
+export enum UnitType {
+    infantry = 'Пехота',
+    cavalry = 'Кавалерия',
+    artillery = 'Артиллерия'
+}
+
+export type UnitPower = {
+    [key in InfantryTactic]: number;
+}
+
+export type UnitDefence = {
+    [key in InfantryTactic]: number | {
+        [key in UnitType]: number
+    };
+}
 
 export interface Unit {
     name: string;
@@ -22,8 +41,24 @@ export interface Unit {
         // sequence of indexes ordered from parent to child
     path: UnitPath;
 
+    type?: UnitType;
+    power?: UnitPower;
+    defence?: UnitDefence;
+    discipline?: number;
+
     subunits?: Unit[];
 }
+
+export const getAllLeafUnits = (unit: Unit): Unit[] => unit.subunits
+    ? unit.subunits.flatMap(getAllLeafUnits)
+    : [unit];
+
+export const getAllSubunits = (unit: Unit): Unit[] => unit.subunits
+    ? [unit, ...unit.subunits.flatMap(getAllSubunits)]
+    : [unit];
+
+export const filterUnitsByType = (units: Unit[], type: UnitType): Unit[] =>
+    units.filter(unit => unit.type === type);
 
 export const getByPath = (armies: Armies, path: UnitPath): Unit => {
     const army = path[0] === 0 ? armies.rovania : armies.brander;

@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Battle, BattleTactic} from "model/battle";
-import {Unit, unitPathsEq} from "model/army";
+import {ArtilleryTactic, Battle, CavalryTactic, InfantryTactic, Tactic} from "model/battle";
+import {filterUnitsByType, getAllSubunits, Unit, unitPathsEq, UnitType} from "model/army";
+import { remove } from "lodash";
 
 export interface BattlesState {
     battles: Battle[];
@@ -11,12 +12,40 @@ const newBattle = (id: number): Battle => ({
     id,
     place: 'Битва ' + id,
     rovania: {
-        tactic: BattleTactic.skirmish,
-        units: []
+        allBattlingUnits: [],
+        [UnitType.infantry]: {
+            tactic: InfantryTactic.skirmish,
+            units: [],
+            totalPower: 0
+        },
+        [UnitType.cavalry]: {
+            tactic: CavalryTactic.support,
+            units: [],
+            totalPower: 0
+        },
+        [UnitType.artillery]: {
+            tactic: ArtilleryTactic.support,
+            units: [],
+            totalPower: 0
+        }
     },
     brander: {
-        tactic: BattleTactic.skirmish,
-        units: []
+        allBattlingUnits: [],
+        [UnitType.infantry]: {
+            tactic: InfantryTactic.skirmish,
+            units: [],
+            totalPower: 0
+        },
+        [UnitType.cavalry]: {
+            tactic: CavalryTactic.support,
+            units: [],
+            totalPower: 0
+        },
+        [UnitType.artillery]: {
+            tactic: ArtilleryTactic.support,
+            units: [],
+            totalPower: 0
+        }
     }
 })
 
@@ -37,8 +66,17 @@ const battles = createSlice({
             const battle = state.battles[battleIndex];
 
             if (battle) {
-                const units = unit.path[0] === 0 ? battle.rovania.units : battle.brander.units;
-                units.push(unit.path);
+                const party = unit.path[0] === 0 ? battle.rovania : battle.brander;
+
+                const allAddedUnits = getAllSubunits(unit);
+                party.allBattlingUnits.push(...allAddedUnits.map(unit => unit.path));
+
+                const addUnitsOfType = (type: UnitType) =>
+                    party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => unit.path));
+
+                addUnitsOfType(UnitType.infantry);
+                addUnitsOfType(UnitType.cavalry);
+                addUnitsOfType(UnitType.artillery);
             }
         },
 
@@ -46,20 +84,67 @@ const battles = createSlice({
             const battle = state.battles[battleIndex];
 
             if (battle) {
-                const units = unit.path[0] === 0 ? battle.rovania.units : battle.brander.units;
-                const unitIndex = units.findIndex(path => unitPathsEq(path, unit.path));
-                units.splice(unitIndex, 1);
+                const party = unit.path[0] === 0 ? battle.rovania : battle.brander;
+                const units = party.allBattlingUnits;
+                const allDeletedUnits = getAllSubunits(unit);
+
+                allDeletedUnits.forEach(unit => {
+                    remove(units, path => unitPathsEq(path, unit.path));
+
+                    if (unit.type) {
+                        remove(party[unit.type].units, path => unitPathsEq(path, unit.path));
+                    }
+                })
             }
         },
 
-        setBattleTactic: (state, {payload: {battleIndex, party, tactic}}: PayloadAction<{battleIndex: number, party: 'rovania' | 'brander', tactic: BattleTactic}>) => {
-            state.battles[battleIndex][party].tactic = tactic;
-        }
+        setBattleTactic: (state, {payload: {battleIndex, party, tactic, unitType}}: PayloadAction<{battleIndex: number, party: 'rovania' | 'brander', tactic: Tactic, unitType: UnitType}>) => {
+            state.battles[battleIndex][party][unitType].tactic = tactic;
+        },
+
+        // _updateForces
     }
 });
 
 /****** EXPORT ******/
 
 export const {addUnitToBattle, removeUnitFromBattle, addBattle, setBattleTactic} = battles.actions;
+
+// export const calculate = (battleIndex: number, party: Party): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
+//     const armies = getState().armiesState.armies;
+//     const battle = getState().battles.battles[battleIndex];
+//     const battleParty = battle[party];
+//
+//     const getSubunits = (unit: Unit): Unit | Unit[] => unit.subunits
+//         ? unit.subunits.flatMap(getSubunits)
+//         : unit;
+//
+//     const regiments = battleParty.units.flatMap(
+//         flow(
+//             unitPath => getByPath(armies, unitPath),
+//             getSubunits
+//         )
+//     )
+//
+//     let mainForces: Unit[] = [];
+//     let mainForcesPower = 0;
+//     // let support: Unit[] = [];
+//
+//     if ([InfantryTactic.skirmish, InfantryTactic.firefight, InfantryTactic.columnAttack, InfantryTactic.square]
+//             .includes(battleParty.tactic)) {
+//         mainForces = filterUnitsByType(regiments, UnitType.infantry);
+//         mainForcesPower = mainForces.reduce((sum, unit) => sum + (unit.power?.[battleParty.tactic] || 0), 0);
+//
+//
+//         // support = filterUnitsByType(regiments, UnitType.artillery);
+//     }
+//
+//     // const mainForces = ({
+//     //     [BattleTactic.skirmish]: () => filterUnitsByType(regiments, UnitType.infantry),
+//     //     [BattleTactic.firefight]: () => filterUnitsByType(regiments, UnitType.infantry),
+//     //     [BattleTactic.columnAttack]: () => filterUnitsByType(regiments, UnitType.infantry),
+//     //     [BattleTactic.square]: () => filterUnitsByType(regiments, UnitType.infantry),
+//     // })[battleParty.tactic]()
+// }
 
 export default battles.reducer;
