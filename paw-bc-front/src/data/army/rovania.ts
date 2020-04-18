@@ -1,4 +1,4 @@
-import {Army} from "model/army";
+import {Army, UnitType} from "model/army";
 import {prepareUnits} from "data/army/utils";
 
 const army: Army = {
@@ -11,7 +11,12 @@ const army: Army = {
             subunits: [{
                 name: '1-я пехотная бригада',
                 subunits: [{
-                    name: '32 линейный полк'
+                    name: '32 линейный полк',
+                    // @ts-ignore
+                    type: UnitType.infantry,
+                    power: {
+                        'Перестрелка': 10
+                    }
                 }, {
                     name: '23 легкий полк'
                 }]

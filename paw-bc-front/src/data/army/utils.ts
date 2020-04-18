@@ -7,10 +7,15 @@ type RawUnit = Omit<Omit<Unit, 'path'>, 'subunits'> & {
 const setPath = (unit: RawUnit, path: UnitPath): Unit => ({
     ...unit,
     path,
-    subunits: unit.subunits && unit.subunits.map((u, i) =>
-        setPath(u, [...path, i] as UnitPath)
+    ...(
+        unit.subunits ? {
+            subunits: unit.subunits.map((u, i) =>
+                setPath(u, [...path, i] as UnitPath)
+            )
+        }:{}
     )
-});
+
+}) as Unit;
 
 export const prepareUnits = (party: number, units: RawUnit[]): Unit[] =>
     units.map((unit, i)  => setPath(unit, [party, i]))

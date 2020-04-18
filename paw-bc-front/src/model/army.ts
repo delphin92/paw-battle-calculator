@@ -1,4 +1,4 @@
-import {InfantryTactic} from "model/battle";
+import {Tactic} from "model/battle";
 
 export interface Army {
     name: string;
@@ -26,44 +26,50 @@ export enum UnitType {
 }
 
 export type UnitPower = {
-    [key in InfantryTactic]: number;
+    [key in Tactic]?: number;
 }
 
 export type UnitDefence = {
-    [key in InfantryTactic]: number | {
+    [key in Tactic]?: number | {
         [key in UnitType]: number
     };
 }
 
-export interface Unit {
+interface UnitBase {
     name: string;
     commanderName?: string;
         // sequence of indexes ordered from parent to child
     path: UnitPath;
-
-    type?: UnitType;
-    power?: UnitPower;
-    defence?: UnitDefence;
-    discipline?: number;
-
-    subunits?: Unit[];
 }
 
-export const getAllLeafUnits = (unit: Unit): Unit[] => unit.subunits
+export interface UnitNode extends UnitBase {
+    subunits: UnitNode[];
+}
+
+export interface UnitLeaf extends UnitBase {
+    type: UnitType;
+    power: UnitPower;
+    defence: UnitDefence;
+    discipline: number;
+}
+
+export type Unit = UnitNode | UnitLeaf;
+
+export const getAllLeafUnits = (unit: Unit): UnitLeaf[] => 'subunits' in unit
     ? unit.subunits.flatMap(getAllLeafUnits)
     : [unit];
 
-export const getAllSubunits = (unit: Unit): Unit[] => unit.subunits
+export const getAllSubunits = (unit: Unit): Unit[] => 'subunits' in unit
     ? [unit, ...unit.subunits.flatMap(getAllSubunits)]
     : [unit];
 
-export const filterUnitsByType = (units: Unit[], type: UnitType): Unit[] =>
-    units.filter(unit => unit.type === type);
+export const filterUnitsByType = (units: Unit[], type: UnitType): UnitLeaf[] =>
+    units.filter(unit => (unit as UnitLeaf).type === type) as UnitLeaf[];
 
 export const getByPath = (armies: Armies, path: UnitPath): Unit => {
     const army = path[0] === 0 ? armies.rovania : armies.brander;
 
-    let unit: Unit | undefined = army.units[path[1]];
+    let unit: UnitNode | undefined = army.units[path[1]] as UnitNode;
 
     if (path.length > 2) {
         unit = unit.subunits?.[path[2]];

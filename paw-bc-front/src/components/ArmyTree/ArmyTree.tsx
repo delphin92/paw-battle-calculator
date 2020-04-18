@@ -48,7 +48,7 @@ const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, ...otherProps})
         <>
             <ListGroup.Item active={isActive} onClick={toggleSelection}>
                 {[...new Array(depth)].map((_, i) => <span key={i} className="depth-filler"/>)}
-                {unit.subunits ?
+                {'subunits' in unit ?
                     isExpanded ?
                         <FaMinus onClick={toggleExpanded}/>
                     :
@@ -59,7 +59,7 @@ const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, ...otherProps})
                 }
                 <strong className="ml-2">{unit.name}</strong> <em>{unit.commanderName}</em>
             </ListGroup.Item>
-            {unit.subunits &&
+            {'subunits' in unit &&
                 <Collapse in={isExpanded}>
                     <div>
                         {unit.subunits.map((unit, index) =>

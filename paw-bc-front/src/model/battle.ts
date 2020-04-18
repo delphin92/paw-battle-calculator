@@ -13,21 +13,26 @@ export interface BattleParty {
 
     [UnitType.infantry]: {
         tactic: InfantryTactic;
-        units: UnitPath[];
+        units: BattlingUnit[];
         totalPower: number;
     }
 
     [UnitType.cavalry]: {
         tactic: CavalryTactic;
-        units: UnitPath[];
+        units: BattlingUnit[];
         totalPower: number;
     }
 
     [UnitType.artillery]: {
         tactic: ArtilleryTactic;
-        units: UnitPath[];
+        units: BattlingUnit[];
         totalPower: number;
     }
+}
+
+export interface BattlingUnit {
+    path: UnitPath;
+    power: number;
 }
 
 export enum InfantryTactic {

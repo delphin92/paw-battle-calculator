@@ -4,8 +4,9 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 import {Battle, BattleParty, InfantryTactic, Tactic} from "model/battle";
-import {Unit, UnitType} from "model/army";
+import {UnitNode, UnitType} from "model/army";
 import {removeUnitFromBattle, setBattleTactic} from "redux/slicers/battles";
+import BattleUnits from "pages/Calc/BattleUnits";
 
 interface BattleCardProps {
     party: 'rovania' | 'brander';
@@ -18,7 +19,7 @@ interface BattleCardState {
 
 interface BattleCardDispatched {
     setBattleTactic: (unitType: UnitType, tactic: Tactic) => void;
-    removeUnitFromBattle: (unit: Unit) => void;
+    removeUnitFromBattle: (unit: UnitNode) => void;
 }
 
 const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => {
@@ -37,6 +38,7 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                     <ToggleButton value={InfantryTactic.square}>{InfantryTactic.square}</ToggleButton>
                 </ToggleButtonGroup>
 
+                <BattleUnits battlingUnits={battleParty[UnitType.infantry].units}/>
             </Card.Body>
         </Card>
     );
@@ -49,6 +51,6 @@ export default withRouter(connect(
     }),
     (dispatch, {party, match: {params: {battleIndex}}}) => ({
         setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)})),
-        removeUnitFromBattle: (unit: Unit) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
+        removeUnitFromBattle: (unit: UnitNode) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleCard));
