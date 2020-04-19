@@ -1,5 +1,6 @@
 import {Army, UnitType} from "model/army";
 import {prepareUnits} from "data/army/utils";
+import {ArtilleryTactic, CavalryTactic, InfantryTactic} from "model/battle";
 
 const army: Army = {
     name: 'Армия Рованской Республики',
@@ -14,10 +15,28 @@ const army: Army = {
                     name: '32 линейный полк',
                     type: UnitType.infantry,
                     power: {
-                        'Перестрелка': 10
+                        [InfantryTactic.skirmish]: 8,
+                        [InfantryTactic.firefight]: 20,
+                        [InfantryTactic.columnAttack]: 35
+                    },
+                    defence: {
+                        [InfantryTactic.skirmish]: 10,
+                        [InfantryTactic.firefight]: 5,
+                        [InfantryTactic.columnAttack]: 2
                     }
                 }, {
-                    name: '23 легкий полк'
+                    name: '23 легкий полк',
+                    type: UnitType.infantry,
+                    power: {
+                        [InfantryTactic.skirmish]: 9,
+                        [InfantryTactic.firefight]: 19,
+                        [InfantryTactic.columnAttack]: 33
+                    },
+                    defence: {
+                        [InfantryTactic.skirmish]: 12,
+                        [InfantryTactic.firefight]: 4,
+                        [InfantryTactic.columnAttack]: 2
+                    }
                 }]
             }, {
                 name: '2-я пехотная бригада',
@@ -39,17 +58,17 @@ const army: Army = {
                     name: '8-й гусарский полк',
                     type: UnitType.cavalry,
                     power: {
-                        'Поддержка': 15,
-                        'Атака': 8,
-                        'Фланкировка': 6
+                        [CavalryTactic.support]: 15,
+                        [CavalryTactic.charge]: 8,
+                        [CavalryTactic.flanking]: 6
                     }
                 }, {
                     name: '11-й конноегерской полк',
                     type: UnitType.cavalry,
                     power: {
-                        'Поддержка': 16,
-                        'Атака': 7,
-                        'Фланкировка': 5
+                        [CavalryTactic.support]: 16,
+                        [CavalryTactic.charge]: 7,
+                        [CavalryTactic.flanking]: 5
                     }
                 }]
             }]
@@ -59,17 +78,17 @@ const army: Army = {
                 name: '1-я батарея',
                 type: UnitType.artillery,
                 power: {
-                    'Поддержка': 10,
-                    'Бомбардировка': 15,
-                    'Подавление артиллерии': 13
+                    [ArtilleryTactic.support]: 10,
+                    [ArtilleryTactic.bombardment]: 15,
+                    [ArtilleryTactic.artillerySuppression]: 13
                 }
             }, {
                 name: '2-я батарея',
                 type: UnitType.artillery,
                 power: {
-                    'Поддержка': 11,
-                    'Бомбардировка': 14,
-                    'Подавление артиллерии': 12
+                    [ArtilleryTactic.support]: 11,
+                    [ArtilleryTactic.bombardment]: 14,
+                    [ArtilleryTactic.artillerySuppression]: 12
                 }
             }]
         }]
