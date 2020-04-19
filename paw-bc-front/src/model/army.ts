@@ -13,6 +13,8 @@ export interface Armies {
     brander: Army;
 }
 
+export const parties: Party[] = ['rovania',  'brander'];
+
 export const partyToIndex = {
     rovania: 0,
     brander: 1

@@ -50,7 +50,7 @@ export default withRouter(connect(
         battleParty: state.battles.battles[parseInt(params.battleIndex)][party]
     }),
     (dispatch, {party, match: {params: {battleIndex}}}) => ({
-        setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)})),
+        setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch<any>(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)})),
         removeUnitFromBattle: (unit: UnitNode) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleCard));
