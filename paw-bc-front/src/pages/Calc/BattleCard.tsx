@@ -4,8 +4,8 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 import {ArtilleryTactic, Battle, BattleParty, CavalryTactic, InfantryTactic, Tactic} from "model/battle";
-import {UnitNode, UnitType} from "model/army";
-import {removeUnitFromBattle, setBattleTactic} from "redux/slicers/battles";
+import {UnitType} from "model/army";
+import {setBattleTactic} from "redux/slicers/battles";
 import BattleUnits from "pages/Calc/BattleUnits";
 
 interface BattleCardProps {
@@ -19,7 +19,6 @@ interface BattleCardState {
 
 interface BattleCardDispatched {
     setBattleTactic: (unitType: UnitType, tactic: Tactic) => void;
-    removeUnitFromBattle: (unit: UnitNode) => void;
 }
 
 const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => {
@@ -30,7 +29,7 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
     return (
         <Card>
             <Card.Body>
-                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                <ToggleButtonGroup type="radio" name="infantry-tactic" className="mb-2"
                                    value={battleParty[UnitType.infantry].tactic}
                                    onChange={setInfantryTactic}
                 >
@@ -42,7 +41,7 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
 
                 <BattleUnits battlingUnits={battleParty[UnitType.infantry].units}/>
 
-                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                <ToggleButtonGroup type="radio" name="cavalry-tactic" className="mb-2"
                                    value={battleParty[UnitType.cavalry].tactic}
                                    onChange={setCavalryTactic}
                 >
@@ -53,7 +52,7 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
 
                 <BattleUnits battlingUnits={battleParty[UnitType.cavalry].units}/>
 
-                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                <ToggleButtonGroup type="radio" name="artillery-tactic" className="mb-2"
                                    value={battleParty[UnitType.artillery].tactic}
                                    onChange={setArtilleryTactic}
                 >
@@ -74,7 +73,6 @@ export default withRouter(connect(
         battleParty: state.battles.battles[parseInt(params.battleIndex)][party]
     }),
     (dispatch, {party, match: {params: {battleIndex}}}) => ({
-        setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch<any>(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)})),
-        removeUnitFromBattle: (unit: UnitNode) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
+        setBattleTactic: (unitType: UnitType, tactic: Tactic) => dispatch<any>(setBattleTactic({unitType, tactic, party, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleCard));
