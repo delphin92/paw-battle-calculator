@@ -1,14 +1,14 @@
-import {Unit, UnitPath} from "model/army";
+import {Unit, UnitLeaf, UnitNode, UnitPath} from "model/army";
 
-type RawUnit = Omit<Omit<Unit, 'path'>, 'subunits'> & {
+type RawUnit = (Omit<Omit<UnitNode, 'path'>, 'subunits'> & {
     subunits?: RawUnit[]
-}
+}) | Omit<UnitLeaf, 'path'>;
 
 const setPath = (unit: RawUnit, path: UnitPath): Unit => ({
     ...unit,
     path,
     ...(
-        unit.subunits ? {
+        'subunits' in unit && unit.subunits ? {
             subunits: unit.subunits.map((u, i) =>
                 setPath(u, [...path, i] as UnitPath)
             )

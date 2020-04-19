@@ -3,7 +3,7 @@ import {Card, ToggleButton, ToggleButtonGroup} from "react-bootstrap";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
-import {Battle, BattleParty, InfantryTactic, Tactic} from "model/battle";
+import {ArtilleryTactic, Battle, BattleParty, CavalryTactic, InfantryTactic, Tactic} from "model/battle";
 import {UnitNode, UnitType} from "model/army";
 import {removeUnitFromBattle, setBattleTactic} from "redux/slicers/battles";
 import BattleUnits from "pages/Calc/BattleUnits";
@@ -24,6 +24,8 @@ interface BattleCardDispatched {
 
 const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatched> = ({battleParty, setBattleTactic}) => {
     const setInfantryTactic = (tactic: Tactic) => setBattleTactic(UnitType.infantry, tactic);
+    const setCavalryTactic = (tactic: Tactic) => setBattleTactic(UnitType.cavalry, tactic);
+    const setArtilleryTactic = (tactic: Tactic) => setBattleTactic(UnitType.artillery, tactic);
 
     return (
         <Card>
@@ -39,6 +41,28 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                 </ToggleButtonGroup>
 
                 <BattleUnits battlingUnits={battleParty[UnitType.infantry].units}/>
+
+                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                                   value={battleParty[UnitType.cavalry].tactic}
+                                   onChange={setCavalryTactic}
+                >
+                    <ToggleButton value={CavalryTactic.support}>{CavalryTactic.support}</ToggleButton>
+                    <ToggleButton value={CavalryTactic.charge}>{CavalryTactic.charge}</ToggleButton>
+                    <ToggleButton value={CavalryTactic.flanking}>{CavalryTactic.flanking}</ToggleButton>
+                </ToggleButtonGroup>
+
+                <BattleUnits battlingUnits={battleParty[UnitType.cavalry].units}/>
+
+                <ToggleButtonGroup type="radio" name="infantry-tactic"
+                                   value={battleParty[UnitType.artillery].tactic}
+                                   onChange={setArtilleryTactic}
+                >
+                    <ToggleButton value={ArtilleryTactic.support}>{ArtilleryTactic.support}</ToggleButton>
+                    <ToggleButton value={ArtilleryTactic.bombardment}>{ArtilleryTactic.bombardment}</ToggleButton>
+                    <ToggleButton value={ArtilleryTactic.artillerySuppression}>{ArtilleryTactic.artillerySuppression}</ToggleButton>
+                </ToggleButtonGroup>
+
+                <BattleUnits battlingUnits={battleParty[UnitType.artillery].units}/>
             </Card.Body>
         </Card>
     );
