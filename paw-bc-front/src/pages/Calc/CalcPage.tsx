@@ -8,6 +8,7 @@ import {Battle} from "model/battle";
 import {BattlesState, addBattle} from "redux/slicers/battles";
 import { FaPlus } from "react-icons/fa";
 import BattleCard from "./BattleCard";
+import BattleConditionsCard from "pages/Calc/BattleConditionsCard";
 
 interface CalcPageProps {
     battle: Battle;
@@ -32,6 +33,8 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                     <Button size="sm"><FaPlus/></Button>
                 </Nav.Item>
             </Nav>
+
+            <BattleConditionsCard battleIndex={parseInt(params.battleIndex)}/>
 
             <Row>
                 <Col md={6}>

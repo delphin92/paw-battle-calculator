@@ -1,16 +1,15 @@
-import {createSlice, PayloadAction, ThunkAction, Action} from "@reduxjs/toolkit";
-import {ArtilleryTactic, Battle, BattlingUnit, CavalryTactic, InfantryTactic, Tactic} from "model/battle";
+import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit";
 import {
-    filterUnitsByType,
-    getAllSubunits,
-    getByPath,
-    Party,
-    Unit,
-    UnitLeaf,
-    unitPathsEq,
-    UnitType
-} from "model/army";
-import { remove } from "lodash";
+    ArtilleryTactic,
+    Battle,
+    BattleConditions,
+    BattlingUnit,
+    CavalryTactic,
+    InfantryTactic,
+    Tactic
+} from "model/battle";
+import {filterUnitsByType, getAllSubunits, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 
 export interface BattlesState {
@@ -21,6 +20,12 @@ export interface BattlesState {
 const newBattle = (id: number): Battle => ({
     id,
     place: 'Битва ' + id,
+    battleConditions: {
+        defenceBonus: 0,
+        cavalryPenalty: 0,
+        formationPenalty: 0,
+        artilleryFactor: 0
+    },
     rovania: {
         allBattlingUnits: [],
         [UnitType.infantry]: {
@@ -138,11 +143,14 @@ const battles = createSlice({
             state.battles[battleIndex][party][unitType].units.forEach((battlingUnit, i) => {
                 battlingUnit.power = powers[i]
             })
+        },
+        _changeBattleConditions: (state, {payload: {battleIndex, field, value}}: PayloadAction<{battleIndex: number, field: keyof BattleConditions, value: number}>) => {
+            state.battles[battleIndex].battleConditions[field] = value;
         }
-},
+    }
 });
 
-const {_setBattleTactic, _updateUnitsPower} = battles.actions;
+const {_setBattleTactic, _updateUnitsPower, _changeBattleConditions} = battles.actions;
 
 /****** EXPORT ******/
 
@@ -161,6 +169,10 @@ export const setBattleTactic = ({battleIndex, party, tactic, unitType}: SetBattl
             .map(unit => unit.power[tactic] ?? 0)
 
         dispatch(_updateUnitsPower({battleIndex, party, unitType, powers}));
+}
+
+export const changeBattleConditions = (battleIndex: number, field: keyof BattleConditions, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
+    dispatch(_changeBattleConditions({battleIndex, field, value}));
 }
 
 export default battles.reducer;

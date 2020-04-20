@@ -4,6 +4,8 @@ export interface Battle {
     id: number;
     place: string;
 
+    battleConditions: BattleConditions;
+
     rovania: BattleParty;
     brander: BattleParty;
 }
@@ -55,6 +57,13 @@ export enum ArtilleryTactic {
 }
 
 export type Tactic = InfantryTactic | CavalryTactic | ArtilleryTactic;
+
+export interface BattleConditions {
+    defenceBonus: number;
+    formationPenalty: number;
+    cavalryPenalty: number;
+    artilleryFactor: number;
+}
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {
     const party = unit.path[0] === 0 ? battle.rovania.allBattlingUnits : battle.brander.allBattlingUnits;

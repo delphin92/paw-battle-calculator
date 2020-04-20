@@ -1,0 +1,19 @@
+.battle-conditions {
+  .form-inline {
+    justify-content: space-between;
+
+    .form-group {
+      .form-label {
+        margin-right: 0.5rem;
+      }
+
+      .form-control {
+        width: 50px !important;
+      }
+
+      &:not(:last-child) {
+        margin-right: 0.75rem;
+      }
+    }
+  }
+}
