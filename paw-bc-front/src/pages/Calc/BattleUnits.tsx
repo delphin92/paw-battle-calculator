@@ -60,6 +60,6 @@ export default withRouter(connect(
     (dispatch, {match: {params: {battleIndex}}}: RouteComponentProps<{battleIndex: string}>) => ({
         changeUnitPower: (unit: UnitLeaf, power: number) =>
             dispatch(changeUnitPower({battleIndex: parseInt(battleIndex), unit, power})),
-        removeUnitFromBattle: (unit: Unit) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
+        removeUnitFromBattle: (unit: Unit) => dispatch<any>(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleUnits));

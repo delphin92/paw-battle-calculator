@@ -12,6 +12,7 @@ export interface Battle {
 
 export interface BattleParty {
     allBattlingUnits: UnitPath[];
+    battleSummary: BattleSummary;
 
     [UnitType.infantry]: {
         tactic: InfantryTactic;
@@ -63,6 +64,16 @@ export interface BattleConditions {
     formationPenalty: number;
     cavalryPenalty: number;
     artilleryFactor: number;
+}
+
+export interface BattleSummary {
+    infantryPower: number;
+    cavalryPower: number;
+    artilleryPower: number;
+
+    cavalrySupportBonus: number;
+    artillerySupportBonus: number;
+    totalPower: number;
 }
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {

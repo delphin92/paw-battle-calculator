@@ -9,6 +9,7 @@ import {BattlesState, addBattle} from "redux/slicers/battles";
 import { FaPlus } from "react-icons/fa";
 import BattleCard from "./BattleCard";
 import BattleConditionsCard from "pages/Calc/BattleConditionsCard";
+import BattleSummaryCard from "pages/Calc/BattleSummaryCard";
 
 interface CalcPageProps {
     battle: Battle;
@@ -20,9 +21,11 @@ interface CalcPageDispatchedProps {
 
 const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{battleIndex: string}> & CalcPageDispatchedProps> =
         ({battles, match: {params}, addBattle}) => {
+    const battleIndex = parseInt(params.battleIndex);
+
     return (
         <>
-            <Nav variant="tabs" activeKey={params.battleIndex}>
+            <Nav variant="tabs" activeKey={battleIndex}>
                 {battles.map((battle, index) =>
                     <Nav.Item key={index}>
                         <Nav.Link as={Link} to={'/calc/' + index} eventKey={index}>{battle.place}</Nav.Link>
@@ -34,7 +37,7 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                 </Nav.Item>
             </Nav>
 
-            <BattleConditionsCard battleIndex={parseInt(params.battleIndex)}/>
+            <BattleConditionsCard battleIndex={battleIndex}/>
 
             <Row>
                 <Col md={6}>
@@ -51,6 +54,15 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                 </Col>
                 <Col md={6}>
                     <BattleCard party="brander"/>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={6}>
+                    <BattleSummaryCard battleIndex={battleIndex} party="rovania"/>
+                </Col>
+                <Col md={6}>
+                    <BattleSummaryCard battleIndex={battleIndex} party="brander"/>
                 </Col>
             </Row>
         </>

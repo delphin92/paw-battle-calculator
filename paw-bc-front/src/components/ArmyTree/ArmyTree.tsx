@@ -86,7 +86,7 @@ export default withRouter(connect(
         battle: state.battles.battles[parseInt(params.battleIndex)] as Battle
     }),
     (dispatch, {match: {params: {battleIndex}}}) => ({
-        addUnitToBattle: (unit: Unit) => dispatch(addUnitToBattle({unit, battleIndex: parseInt(battleIndex)})),
-        removeUnitFromBattle: (unit: Unit) => dispatch(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
+        addUnitToBattle: (unit: Unit) => dispatch<any>(addUnitToBattle({unit, battleIndex: parseInt(battleIndex)})),
+        removeUnitFromBattle: (unit: Unit) => dispatch<any>(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(ArmyTree));
