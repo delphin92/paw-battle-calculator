@@ -1,4 +1,4 @@
-import {Unit, UnitPath, unitPathsEq, UnitType} from "model/army";
+import {UnitPath, UnitType} from "model/army";
 
 export interface Battle {
     id: number;
@@ -96,15 +96,3 @@ export interface BattlePartyDamage {
     [UnitType.cavalry]: UnitDamage[];
     [UnitType.artillery]: UnitDamage[];
 }
-
-export const isUnitInBattle = (battle: Battle, unit: Unit) => {
-    const party = unit.path[0] === 0 ? battle.rovania.allBattlingUnits : battle.brander.allBattlingUnits;
-    const unitIndex = party.findIndex(path => unitPathsEq(path, unit.path));
-    return unitIndex >= 0;
-}
-
-export const getDamage = ({path, takenDamage: {moraleDamage, manpowerDamage}}: BattlingUnit): UnitDamage => ({
-    unit: path,
-    manpowerDamage,
-    moraleDamage
-})

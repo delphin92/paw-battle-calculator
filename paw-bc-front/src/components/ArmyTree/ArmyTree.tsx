@@ -5,9 +5,10 @@ import {Collapse, ListGroup} from "react-bootstrap";
 import "./ArmyTree.scss";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
-import {Battle, isUnitInBattle} from "model/battle";
+import {Battle} from "model/battle";
 import {addUnitToBattle, removeUnitFromBattle} from "redux/slicers/battles";
 import {RouteComponentProps, withRouter} from "react-router-dom";
+import {isUnitInBattle} from "model/logic/battleLogic";
 
 interface ArmyTreeProps {
     party: 'rovania' | 'brander'

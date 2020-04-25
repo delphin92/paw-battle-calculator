@@ -1,6 +1,5 @@
 import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit";
 import {
-    ArtilleryTactic,
     Battle,
     BattleConditions,
     BattlePartyDamage,
@@ -9,9 +8,10 @@ import {
     Tactic
 } from "model/battle";
 import {filterUnitsByType, getAllSubunits, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
-import {remove, sumBy} from "lodash";
+import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 import {newBattle} from "model/instances/battleInstances";
+import {calculateBattleSummary, calculatePartyDamage, calculateUnitPower} from "model/logic/battleLogic";
 
 export interface BattlesState {
     battles: Battle[];
@@ -54,7 +54,7 @@ const battles = createSlice({
                 const addUnitsOfType = (type: UnitType) =>
                     party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
                         path: unit.path,
-                        power: unit.power?.[party[unit.type].tactic] ?? 0,
+                        power: calculateUnitPower(unit, party[unit.type].tactic),
                         takenDamage: {
                             manpowerDamage: 0,
                             moraleDamage: 0
@@ -161,7 +161,7 @@ export const setBattleTactic = ({battleIndex, party, tactic, unitType}: SetBattl
 
         const powers = battleParty[unitType].units
             .map(battlingUnit => getByPath(armies, battlingUnit.path) as UnitLeaf)
-            .map(unit => unit.power[tactic] ?? 0)
+            .map(unit => calculateUnitPower(unit, tactic));
 
         dispatch(_updateUnitsPower({battleIndex, party, unitType, powers}));
         dispatch(calculate(battleIndex));
@@ -187,77 +187,6 @@ const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, A
         rovania: calculatePartyDamage(battle, 'rovania'),
         brander: calculatePartyDamage(battle, 'brander')
     }))
-}
-
-const calculateBattleSummary = (battle: Battle, party: Party): BattleSummary => {
-    const battleParty = battle[party];
-    const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
-
-    let totalPower = 0;
-
-    const infantryPower = sumBy(battleParty[UnitType.infantry].units, unit => unit.power);
-    const cavalryPower = sumBy(battleParty[UnitType.cavalry].units, unit => unit.power);
-    const artilleryPower = sumBy(battleParty[UnitType.artillery].units, unit => unit.power);
-
-    totalPower += infantryPower;
-
-    // if (battleParty[UnitType.cavalry].tactic === CavalryTactic.support) {
-    //     if (battleParty[UnitType.infantry].tactic === InfantryTactic.firefight ||
-    //         battleParty[UnitType.infantry].tactic === InfantryTactic.columnAttack) {
-
-            const enemyCavalryPower = sumBy(enemyParty[UnitType.cavalry].units, unit => unit.power);
-            const cavalrySupportBonus = (cavalryPower - enemyCavalryPower) *
-                (1 - 0.1 * battle.battleConditions.cavalryPenalty);
-            totalPower += cavalrySupportBonus
-    //     }
-    // }
-
-    let artillerySupportBonus = 0;
-
-    if (battleParty[UnitType.artillery].tactic === ArtilleryTactic.support) {
-        if (enemyParty[UnitType.artillery].tactic === ArtilleryTactic.artillerySuppression) {
-            const enemyArtilleryPower = sumBy(enemyParty[UnitType.artillery].units, unit => unit.power);
-            artillerySupportBonus = artilleryPower - enemyArtilleryPower;
-        } else {
-            artillerySupportBonus = artilleryPower;
-        }
-
-        totalPower += artillerySupportBonus;
-    }
-
-    return {
-        infantryPower,
-        cavalryPower,
-        artilleryPower,
-        cavalrySupportBonus,
-        artillerySupportBonus,
-        totalPower
-    };
-}
-
-const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyDamage => {
-    const battleParty = battle[party];
-    const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
-
-    const battlingUnitsCount = battleParty.allBattlingUnits.length;
-
-    return {
-        [UnitType.infantry]: battleParty[UnitType.infantry].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
-        [UnitType.cavalry]: battleParty[UnitType.cavalry].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
-        [UnitType.artillery]: battleParty[UnitType.artillery].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
-    };
 }
 
 export default battles.reducer;

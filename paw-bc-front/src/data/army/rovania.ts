@@ -65,7 +65,9 @@ const army: Army = {
                         [CavalryTactic.support]: 15,
                         [CavalryTactic.charge]: 8,
                         [CavalryTactic.flanking]: 6
-                    }
+                    },
+                    manpower: 1200,
+                    morale: 1200
                 }, {
                     name: '11-й конноегерской полк',
                     type: UnitType.cavalry,
@@ -73,7 +75,9 @@ const army: Army = {
                         [CavalryTactic.support]: 16,
                         [CavalryTactic.charge]: 7,
                         [CavalryTactic.flanking]: 5
-                    }
+                    },
+                    manpower: 1200,
+                    morale: 1300
                 }]
             }]
         }, {
@@ -82,18 +86,22 @@ const army: Army = {
                 name: '1-я батарея',
                 type: UnitType.artillery,
                 power: {
-                    [ArtilleryTactic.support]: 10,
-                    [ArtilleryTactic.bombardment]: 15,
-                    [ArtilleryTactic.artillerySuppression]: 13
-                }
+                    [ArtilleryTactic.support]: 100,
+                    [ArtilleryTactic.bombardment]: 150,
+                    [ArtilleryTactic.artillerySuppression]: 130
+                },
+                manpower: 100,
+                morale: 100
             }, {
                 name: '2-я батарея',
                 type: UnitType.artillery,
                 power: {
-                    [ArtilleryTactic.support]: 11,
-                    [ArtilleryTactic.bombardment]: 14,
-                    [ArtilleryTactic.artillerySuppression]: 12
-                }
+                    [ArtilleryTactic.support]: 110,
+                    [ArtilleryTactic.bombardment]: 140,
+                    [ArtilleryTactic.artillerySuppression]: 120
+                },
+                manpower: 100,
+                morale: 100
             }]
         }]
     }, {

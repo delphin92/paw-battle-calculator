@@ -1,8 +1,9 @@
 import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit";
 import {armies} from "data/army";
 import {Armies, getByPath, UnitLeaf, UnitType} from "model/army";
-import {getDamage, UnitDamage} from "model/battle";
+import {UnitDamage} from "model/battle";
 import {RootState} from "redux/rootReducer";
+import {getDamage} from "model/logic/battleLogic";
 
 interface ArmiesState {
     armies: Armies;
