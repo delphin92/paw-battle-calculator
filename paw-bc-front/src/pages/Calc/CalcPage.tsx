@@ -10,6 +10,7 @@ import { FaPlus } from "react-icons/fa";
 import BattleCard from "./BattleCard";
 import BattleConditionsCard from "pages/Calc/BattleConditionsCard";
 import BattleSummaryCard from "pages/Calc/BattleSummaryCard";
+import BattleDamageCard from "pages/Calc/BattleDamageCard";
 
 interface CalcPageProps {
     battle: Battle;
@@ -63,6 +64,15 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                 </Col>
                 <Col md={6}>
                     <BattleSummaryCard battleIndex={battleIndex} party="brander"/>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col md={6}>
+                    <BattleDamageCard battleIndex={battleIndex} party="rovania"/>
+                </Col>
+                <Col md={6}>
+                    <BattleDamageCard battleIndex={battleIndex} party="brander"/>
                 </Col>
             </Row>
         </>

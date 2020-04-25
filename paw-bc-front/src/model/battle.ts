@@ -36,6 +36,7 @@ export interface BattleParty {
 export interface BattlingUnit {
     path: UnitPath;
     power: number;
+    takenDamage: Damage;
 }
 
 export enum InfantryTactic {
@@ -74,6 +75,26 @@ export interface BattleSummary {
     cavalrySupportBonus: number;
     artillerySupportBonus: number;
     totalPower: number;
+}
+
+// export interface BattleResult {
+//     manpowerDamage: number;
+//     moraleDamage: number;
+// }
+
+export interface Damage {
+    manpowerDamage: number;
+    moraleDamage: number;
+}
+
+export interface UnitDamage extends Damage {
+    unit: UnitPath;
+}
+
+export interface BattlePartyDamage {
+    [UnitType.infantry]: UnitDamage[];
+    [UnitType.cavalry]: UnitDamage[];
+    [UnitType.artillery]: UnitDamage[];
 }
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {

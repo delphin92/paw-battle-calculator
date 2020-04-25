@@ -53,6 +53,8 @@ export interface UnitLeaf extends UnitBase {
     power: UnitPower;
     defence: UnitDefence;
     discipline: number;
+    manpower: number;
+    morale: number;
 }
 
 export type Unit = UnitNode | UnitLeaf;

@@ -23,7 +23,9 @@ const army: Army = {
                         [InfantryTactic.skirmish]: 10,
                         [InfantryTactic.firefight]: 5,
                         [InfantryTactic.columnAttack]: 2
-                    }
+                    },
+                    manpower: 1400,
+                    morale: 1400
                 }, {
                     name: '23 легкий полк',
                     type: UnitType.infantry,
@@ -36,7 +38,9 @@ const army: Army = {
                         [InfantryTactic.skirmish]: 12,
                         [InfantryTactic.firefight]: 4,
                         [InfantryTactic.columnAttack]: 2
-                    }
+                    },
+                    manpower: 1400,
+                    morale: 1200
                 }]
             }, {
                 name: '2-я пехотная бригада',

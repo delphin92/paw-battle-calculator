@@ -2,7 +2,9 @@ import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit"
 import {
     ArtilleryTactic,
     Battle,
-    BattleConditions, BattleSummary,
+    BattleConditions,
+    BattlePartyDamage,
+    BattleSummary,
     BattlingUnit,
     Tactic
 } from "model/battle";
@@ -18,6 +20,7 @@ export interface BattlesState {
 
 interface AddOrRemoveUnitPayload {battleIndex: number, unit: Unit}
 
+interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyDamage, brander: BattlePartyDamage}
 
 interface SetBattleTacticActionPayload {
     battleIndex: number,
@@ -51,7 +54,11 @@ const battles = createSlice({
                 const addUnitsOfType = (type: UnitType) =>
                     party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
                         path: unit.path,
-                        power: unit.power?.[party[unit.type].tactic] ?? 0
+                        power: unit.power?.[party[unit.type].tactic] ?? 0,
+                        takenDamage: {
+                            manpowerDamage: 0,
+                            moraleDamage: 0
+                        }
                     })));
 
                 addUnitsOfType(UnitType.infantry);
@@ -105,11 +112,28 @@ const battles = createSlice({
         _updateBattleSummaries: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattleSummary, brander: BattleSummary}>) => {
             state.battles[battleIndex].rovania.battleSummary = rovania;
             state.battles[battleIndex].brander.battleSummary = brander;
+        },
+        _setTakenDamage: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<SetTakenDamagePayload>) => {
+            const battle = state.battles[battleIndex];
+
+            const setDamageForType = (type: UnitType) => {
+                battle.rovania[type].units.forEach((unit, i) =>
+                    unit.takenDamage = rovania[type][i]
+                );
+
+                battle.brander[type].units.forEach((unit, i) =>
+                    unit.takenDamage = brander[type][i]
+                );
+            }
+
+            setDamageForType(UnitType.infantry);
+            setDamageForType(UnitType.cavalry);
+            setDamageForType(UnitType.artillery);
         }
     }
 });
 
-const {_setBattleTactic, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries} = battles.actions;
+const {_setBattleTactic, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage} = battles.actions;
 
 /****** EXPORT ******/
 
@@ -148,14 +172,21 @@ export const changeBattleConditions = (battleIndex: number, field: keyof BattleC
 }
 
 const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
-    const state = getState();
-    const battle = state.battles.battles[battleIndex];
+    let battle = getState().battles.battles[battleIndex];
 
     dispatch(_updateBattleSummaries({
         battleIndex,
         rovania: calculateBattleSummary(battle, 'rovania'),
         brander: calculateBattleSummary(battle, 'brander')
     }));
+
+    battle = getState().battles.battles[battleIndex];
+
+    dispatch(_setTakenDamage({
+        battleIndex,
+        rovania: calculatePartyDamage(battle, 'rovania'),
+        brander: calculatePartyDamage(battle, 'brander')
+    }))
 }
 
 const calculateBattleSummary = (battle: Battle, party: Party): BattleSummary => {
@@ -201,6 +232,31 @@ const calculateBattleSummary = (battle: Battle, party: Party): BattleSummary => 
         cavalrySupportBonus,
         artillerySupportBonus,
         totalPower
+    };
+}
+
+const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyDamage => {
+    const battleParty = battle[party];
+    const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
+
+    const battlingUnitsCount = battleParty.allBattlingUnits.length;
+
+    return {
+        [UnitType.infantry]: battleParty[UnitType.infantry].units.map(unit => ({
+            unit: unit.path,
+            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
+            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
+        })),
+        [UnitType.cavalry]: battleParty[UnitType.cavalry].units.map(unit => ({
+            unit: unit.path,
+            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
+            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
+        })),
+        [UnitType.artillery]: battleParty[UnitType.artillery].units.map(unit => ({
+            unit: unit.path,
+            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
+            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
+        })),
     };
 }
 

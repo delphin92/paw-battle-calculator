@@ -17,7 +17,9 @@ const army: Army = {
                 },
                 defence: {
                     [InfantryTactic.firefight]: 6
-                }
+                },
+                manpower: 2400,
+                morale: 2600
             }]
         }]
     }])
