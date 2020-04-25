@@ -102,3 +102,9 @@ export const isUnitInBattle = (battle: Battle, unit: Unit) => {
     const unitIndex = party.findIndex(path => unitPathsEq(path, unit.path));
     return unitIndex >= 0;
 }
+
+export const getDamage = ({path, takenDamage: {moraleDamage, manpowerDamage}}: BattlingUnit): UnitDamage => ({
+    unit: path,
+    manpowerDamage,
+    moraleDamage
+})

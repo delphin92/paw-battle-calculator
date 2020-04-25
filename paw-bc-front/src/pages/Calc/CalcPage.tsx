@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 import {Battle} from "model/battle";
 import {BattlesState, addBattle} from "redux/slicers/battles";
+import {applyBattleDamage} from "redux/slicers/armiesState";
 import { FaPlus } from "react-icons/fa";
 import BattleCard from "./BattleCard";
 import BattleConditionsCard from "pages/Calc/BattleConditionsCard";
@@ -18,10 +19,11 @@ interface CalcPageProps {
 
 interface CalcPageDispatchedProps {
     addBattle: () => void;
+    applyBattleDamage: (battleIndex: number) => void;
 }
 
 const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{battleIndex: string}> & CalcPageDispatchedProps> =
-        ({battles, match: {params}, addBattle}) => {
+        ({battles, match: {params}, addBattle, applyBattleDamage}) => {
     const battleIndex = parseInt(params.battleIndex);
 
     return (
@@ -75,6 +77,10 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                     <BattleDamageCard battleIndex={battleIndex} party="brander"/>
                 </Col>
             </Row>
+
+            <div className="d-flex justify-content-center">
+                <Button onClick={() => applyBattleDamage(battleIndex)}>Применить результат</Button>
+            </div>
         </>
     );
 };
@@ -84,5 +90,5 @@ export default connect(
         battle: state.battles.battles[parseInt(ownProps.match.params.battleIndex)] as Battle,
         ...state.battles
     }),
-    {addBattle}
+    {addBattle, applyBattleDamage}
 )(CalcPage);
