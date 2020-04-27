@@ -13,6 +13,7 @@ export interface Battle {
 export interface BattleParty {
     allBattlingUnits: UnitPath[];
     battleSummary: BattleSummary;
+    report: string;
 
     [UnitType.infantry]: {
         tactic: InfantryTactic;

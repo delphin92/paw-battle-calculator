@@ -4,6 +4,7 @@ import {InfantryTactic} from "model/battle";
 
 const army: Army = {
     name: 'Армия Королевства Брандер',
+    commanderName: 'Иоахим Фридрих Фон Кёниг',
     units: prepareUnits(1, [{
         name: 'Колонна Хагена',
         commanderName: 'Хаген',

@@ -15,7 +15,7 @@ import {
     calculateBattlePartyUnitsPower,
     calculateBattleSummary,
     calculatePartyDamage,
-    calculateUnitPower
+    calculateUnitPower, generateReport
 } from "model/logic/battleLogic";
 
 export interface BattlesState {
@@ -27,6 +27,7 @@ interface AddOrRemoveUnitPayload {battleIndex: number, unit: Unit}
 interface ChangeUnitData {battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit, value: any}
 // interface ChangeUnitData {battleIndex: number, party: Party, type: UnitType, index: number, field: keyof BattlingUnit, value: any}
 interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyUnitsDamage, brander: BattlePartyUnitsDamage}
+interface SetReportPayload {battleIndex: number, rovania: string, brander: string}
 
 interface SetBattleTacticActionPayload {
     battleIndex: number,
@@ -156,11 +157,15 @@ const battles = createSlice({
             setDamageForType(UnitType.infantry);
             setDamageForType(UnitType.cavalry);
             setDamageForType(UnitType.artillery);
+        },
+        _setReport: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<SetReportPayload>) => {
+            state.battles[battleIndex].rovania.report = rovania;
+            state.battles[battleIndex].brander.report = brander;
         }
     }
 });
 
-const {_setBattleTactic, _changeUnitData, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage} = battles.actions;
+const {_setBattleTactic, _changeUnitData, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage, _setReport} = battles.actions;
 
 /****** EXPORT ******/
 
@@ -217,6 +222,14 @@ const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, A
         battleIndex,
         rovania: calculatePartyDamage(battle, 'rovania'),
         brander: calculatePartyDamage(battle, 'brander')
+    }))
+
+    battle = getState().battles.battles[battleIndex];
+
+    dispatch(_setReport({
+        battleIndex,
+        rovania: generateReport(battle, 'rovania', getState().armiesState.armies),
+        brander: generateReport(battle, 'brander', getState().armiesState.armies)
     }))
 }
 

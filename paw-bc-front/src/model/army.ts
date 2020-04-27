@@ -2,6 +2,7 @@ import {Tactic} from "model/battle";
 
 export interface Army {
     name: string;
+    commanderName: string;
 
     units: Unit[];
 }

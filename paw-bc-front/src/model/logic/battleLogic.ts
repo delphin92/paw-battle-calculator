@@ -123,3 +123,34 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
         [UnitType.artillery]: calculateDamageForType(UnitType.artillery)
     };
 }
+
+export const generateReport = (battle: Battle, party: Party, armies: Armies): string => {
+    const battleParty = battle[party];
+    const enemy = battle[party === 'rovania' ? 'brander' : 'rovania'];
+
+    let text = '';
+
+    const commanderName = armies[party].commanderName;
+    const unitNames = battleParty.allBattlingUnits
+        .map(unit => getByPath(armies, unit))
+        .filter(unit => 'type' in unit)
+        .map(unit => unit.name).join(', ');
+
+    const enemyManpower = sumBy(
+        enemy.allBattlingUnits.map(unit => getByPath(armies, unit)).filter(unit => 'manpower' in unit) as UnitLeaf[],
+        unit => unit.manpower
+    );
+
+    // const damage = battleParty.allBattlingUnits
+    //     .map(unit => getByPath(armies, unit)).map(unit).join(', ');
+
+    text += `Генерал ${commanderName}!\n`+
+            `Вверенные мне подразделения ведут бой ${battle.place}\n` +
+            `В бою участвуют: ${unitNames}\n` +
+            `Пехота производит ${battleParty[UnitType.infantry].tactic},\n` +
+            `Кавалерия производит ${battleParty[UnitType.cavalry].tactic},\n` +
+            `Артиллерия производит ${battleParty[UnitType.artillery].tactic}.\n` +
+            `Нам противостоит примерно ${enemyManpower} человек` +
+    '';
+    return text;
+}

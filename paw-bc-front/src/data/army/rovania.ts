@@ -4,6 +4,7 @@ import {ArtilleryTactic, CavalryTactic, InfantryTactic} from "model/battle";
 
 const army: Army = {
     name: 'Армия Рованской Республики',
+    commanderName: 'Жан-Люк Ратьер',
     units: prepareUnits(0, [{
         name: '1-й пехотный корпус',
         commanderName: 'Жозес де Вон',

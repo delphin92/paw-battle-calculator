@@ -11,6 +11,7 @@ export const emptyBattleParty: BattleParty = {
         artillerySupportBonus: 0,
         totalPower: 0
     },
+    report: '',
     [UnitType.infantry]: {
         tactic: InfantryTactic.skirmish,
         units: [],
