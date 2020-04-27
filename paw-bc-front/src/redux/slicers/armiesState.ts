@@ -4,6 +4,7 @@ import {Armies, getByPath, UnitLeaf, UnitType} from "model/army";
 import {UnitDamage} from "model/battle";
 import {RootState} from "redux/rootReducer";
 import {getDamage} from "model/logic/battleLogic";
+import {calculateAll} from "redux/slicers/battles";
 
 interface ArmiesState {
     armies: Armies;
@@ -42,6 +43,7 @@ export const applyBattleDamage = (battleIndex: number): ThunkAction<void, RootSt
     ];
 
     dispatch(_takeDamage(allDamage));
+    dispatch(calculateAll())
 }
 
 export default armiesState.reducer;

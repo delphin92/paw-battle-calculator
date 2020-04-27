@@ -82,6 +82,14 @@ export interface BattleSummary {
 //     moraleDamage: number;
 // }
 
+interface BattlePartyUnitsData<Data> {
+    [UnitType.infantry]: Data[];
+    [UnitType.cavalry]: Data[];
+    [UnitType.artillery]: Data[];
+}
+
+export type BattlePartyUnitsPower = BattlePartyUnitsData<number>;
+
 export interface Damage {
     manpowerDamage: number;
     moraleDamage: number;
@@ -91,8 +99,4 @@ export interface UnitDamage extends Damage {
     unit: UnitPath;
 }
 
-export interface BattlePartyDamage {
-    [UnitType.infantry]: UnitDamage[];
-    [UnitType.cavalry]: UnitDamage[];
-    [UnitType.artillery]: UnitDamage[];
-}
+export type BattlePartyUnitsDamage = BattlePartyUnitsData<UnitDamage>;

@@ -1,14 +1,16 @@
 import {
     ArtilleryTactic,
     Battle,
-    BattlePartyDamage,
+    BattleParty,
+    BattlePartyUnitsDamage,
+    BattlePartyUnitsPower,
     BattleSummary,
     BattlingUnit,
     InfantryTactic,
     Tactic,
     UnitDamage
 } from "model/battle";
-import {Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {Armies, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
 import {sumBy} from "lodash";
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {
@@ -35,6 +37,17 @@ export const calculateUnitPower = (unit: UnitLeaf, tactic: Tactic): number => {
     }
 
     return (unit.power[tactic] ?? 0) / 100 * numberFactor;
+}
+
+export const calculateBattlePartyUnitsPower = (battleParty: BattleParty, armies: Armies): BattlePartyUnitsPower => {
+    const getForType = (type: UnitType) => battleParty[type].units
+            .map(unit => calculateUnitPower(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic));
+
+    return {
+        [UnitType.infantry]: getForType(UnitType.infantry),
+        [UnitType.cavalry]: getForType(UnitType.cavalry),
+        [UnitType.artillery]: getForType(UnitType.infantry),
+    }
 }
 
 export const calculateBattleSummary = (battle: Battle, party: Party): BattleSummary => {
@@ -85,7 +98,7 @@ export const calculateBattleSummary = (battle: Battle, party: Party): BattleSumm
     };
 }
 
-export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyDamage => {
+export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyUnitsDamage => {
     const battleParty = battle[party];
     const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
 

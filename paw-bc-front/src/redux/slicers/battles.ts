@@ -2,16 +2,21 @@ import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit"
 import {
     Battle,
     BattleConditions,
-    BattlePartyDamage,
+    BattlePartyUnitsDamage, BattlePartyUnitsPower,
     BattleSummary,
     BattlingUnit,
     Tactic
 } from "model/battle";
-import {filterUnitsByType, getAllSubunits, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {filterUnitsByType, getAllSubunits, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
 import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 import {newBattle} from "model/instances/battleInstances";
-import {calculateBattleSummary, calculatePartyDamage, calculateUnitPower} from "model/logic/battleLogic";
+import {
+    calculateBattlePartyUnitsPower,
+    calculateBattleSummary,
+    calculatePartyDamage,
+    calculateUnitPower
+} from "model/logic/battleLogic";
 
 export interface BattlesState {
     battles: Battle[];
@@ -20,7 +25,7 @@ export interface BattlesState {
 
 interface AddOrRemoveUnitPayload {battleIndex: number, unit: Unit}
 
-interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyDamage, brander: BattlePartyDamage}
+interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyUnitsDamage, brander: BattlePartyUnitsDamage}
 
 interface SetBattleTacticActionPayload {
     battleIndex: number,
@@ -100,11 +105,22 @@ const battles = createSlice({
                 stUnit.power = power;
             }
         },
-        _updateUnitsPower: (state, {payload: {battleIndex, party, unitType, powers}}: PayloadAction<{battleIndex: number, party: Party, unitType: UnitType, powers: number[]}>) => {
+        _updateUnitsPower: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattlePartyUnitsPower, brander: BattlePartyUnitsPower}>) => {
+            const battle = state.battles[battleIndex];
 
-            state.battles[battleIndex][party][unitType].units.forEach((battlingUnit, i) => {
-                battlingUnit.power = powers[i]
-            })
+            const setPowerForType = (type: UnitType) => {
+                battle.rovania[type].units.forEach((unit, i) =>
+                    unit.power = rovania[type][i]
+                );
+
+                battle.brander[type].units.forEach((unit, i) =>
+                    unit.power = brander[type][i]
+                );
+            }
+
+            setPowerForType(UnitType.infantry);
+            setPowerForType(UnitType.cavalry);
+            setPowerForType(UnitType.artillery);
         },
         _changeBattleConditions: (state, {payload: {battleIndex, field, value}}: PayloadAction<{battleIndex: number, field: keyof BattleConditions, value: number}>) => {
             state.battles[battleIndex].battleConditions[field] = value;
@@ -152,27 +168,26 @@ export const removeUnitFromBattle = ({battleIndex, unit}: AddOrRemoveUnitPayload
 };
 
 export const setBattleTactic = ({battleIndex, party, tactic, unitType}: SetBattleTacticActionPayload): ThunkAction<void, RootState, unknown, Action<unknown>> =>
-    (dispatch, getState) => {
+    dispatch => {
         dispatch(_setBattleTactic({battleIndex, party, tactic, unitType}));
-
-        const state = getState();
-        const armies = state.armiesState.armies;
-        const battleParty = state.battles.battles[battleIndex][party];
-
-        const powers = battleParty[unitType].units
-            .map(battlingUnit => getByPath(armies, battlingUnit.path) as UnitLeaf)
-            .map(unit => calculateUnitPower(unit, tactic));
-
-        dispatch(_updateUnitsPower({battleIndex, party, unitType, powers}));
         dispatch(calculate(battleIndex));
     }
 
 export const changeBattleConditions = (battleIndex: number, field: keyof BattleConditions, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
     dispatch(_changeBattleConditions({battleIndex, field, value}));
+    dispatch(calculate(battleIndex));
 }
 
 const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
     let battle = getState().battles.battles[battleIndex];
+
+    dispatch(_updateUnitsPower({
+        battleIndex,
+        rovania: calculateBattlePartyUnitsPower(battle['rovania'], getState().armiesState.armies),
+        brander: calculateBattlePartyUnitsPower(battle['brander'], getState().armiesState.armies),
+    }));
+
+    battle = getState().battles.battles[battleIndex];
 
     dispatch(_updateBattleSummaries({
         battleIndex,
@@ -187,6 +202,12 @@ const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, A
         rovania: calculatePartyDamage(battle, 'rovania'),
         brander: calculatePartyDamage(battle, 'brander')
     }))
+}
+
+export const calculateAll = (): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
+    getState().battles.battles.forEach((_, i) => {
+        dispatch(calculate(i));
+    })
 }
 
 export default battles.reducer;
