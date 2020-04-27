@@ -4,7 +4,7 @@ import {Button, Form, FormControl, InputGroup} from "react-bootstrap";
 import {Armies, getByPath, UnitLeaf, Unit} from "model/army";
 import { flow } from "lodash";
 import {RootState} from "redux/rootReducer";
-import {changeUnitPower, removeUnitFromBattle} from "redux/slicers/battles";
+import {changeUnitData, removeUnitFromBattle} from "redux/slicers/battles";
 import {connect} from "react-redux";
 import { FaTimes } from "react-icons/fa";
 import {RouteComponentProps, withRouter} from "react-router-dom";
@@ -19,16 +19,16 @@ interface BattleUnitsState {
 }
 
 interface BattleUnitsDispatched {
-    changeUnitPower: (unit: UnitLeaf, power: number) => void;
+    changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit, value: any) => void;
     removeUnitFromBattle: (unit: Unit) => void;
 }
 
-const BattleUnits: React.FC<BattleUnitsProps & BattleUnitsState & BattleUnitsDispatched> = ({battlingUnits, armies, changeUnitPower, removeUnitFromBattle}) => (
+const BattleUnits: React.FC<BattleUnitsProps & BattleUnitsState & BattleUnitsDispatched> = ({battlingUnits, armies, changeUnitData, removeUnitFromBattle}) => (
     <>
         <Form inline className="mb-3">
             {battlingUnits.map(flow(
-                ({path, power}, index) => ({unit: getByPath(armies, path) as UnitLeaf, power, index}),
-                ({unit, power, index}) =>
+                ({path, ...other}, index) => ({unit: getByPath(armies, path) as UnitLeaf, index, ...other}),
+                ({unit, power, damageDistributionCoefficient, index}) =>
                     <InputGroup key={index} className="unit-power-input-group" size="sm">
                         <InputGroup.Prepend>
                             <InputGroup.Text>{unit.name}</InputGroup.Text>
@@ -37,7 +37,14 @@ const BattleUnits: React.FC<BattleUnitsProps & BattleUnitsState & BattleUnitsDis
                             type="number"
                             value={power}
                             onChange={({target: {value}}: ChangeEvent<HTMLInputElement>) =>
-                                changeUnitPower(unit, parseInt(value))
+                                changeUnitData(unit, 'power', parseInt(value))
+                            }
+                        />
+                        <FormControl
+                            type="number"
+                            value={damageDistributionCoefficient}
+                            onChange={({target: {value}}: ChangeEvent<HTMLInputElement>) =>
+                                changeUnitData(unit, 'damageDistributionCoefficient', parseInt(value))
                             }
                         />
                         <InputGroup.Append>
@@ -58,8 +65,8 @@ export default withRouter(connect(
         armies: state.armiesState.armies
     }),
     (dispatch, {match: {params: {battleIndex}}}: RouteComponentProps<{battleIndex: string}>) => ({
-        changeUnitPower: (unit: UnitLeaf, power: number) =>
-            dispatch(changeUnitPower({battleIndex: parseInt(battleIndex), unit, power})),
+        changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit, value: any) =>
+            dispatch<any>(changeUnitData(parseInt(battleIndex), unit, field, value)),
         removeUnitFromBattle: (unit: Unit) => dispatch<any>(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })
 )(BattleUnits));

@@ -102,25 +102,24 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
     const battleParty = battle[party];
     const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
 
-    const battlingUnitsCount = battleParty[UnitType.infantry].units.length +
-        battleParty[UnitType.cavalry].units.length +
-        battleParty[UnitType.artillery].units.length;
+    const sumDamDistrCoeffForType = (type: UnitType) =>
+        sumBy(battleParty[type].units, battlingUnit => battlingUnit.damageDistributionCoefficient);
+
+    const damDistrCoeffSum =
+        sumDamDistrCoeffForType(UnitType.infantry) +
+        sumDamDistrCoeffForType(UnitType.cavalry) +
+        sumDamDistrCoeffForType(UnitType.artillery);
+
+    const calculateDamageForType = (type: UnitType) =>
+        battleParty[type].units.map(unit => ({
+            unit: unit.path,
+            manpowerDamage: enemyParty.battleSummary.totalPower / damDistrCoeffSum * unit.damageDistributionCoefficient,
+            moraleDamage: enemyParty.battleSummary.totalPower / damDistrCoeffSum * unit.damageDistributionCoefficient
+        }))
 
     return {
-        [UnitType.infantry]: battleParty[UnitType.infantry].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
-        [UnitType.cavalry]: battleParty[UnitType.cavalry].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
-        [UnitType.artillery]: battleParty[UnitType.artillery].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount,
-            moraleDamage: enemyParty.battleSummary.totalPower / battlingUnitsCount
-        })),
+        [UnitType.infantry]: calculateDamageForType(UnitType.infantry),
+        [UnitType.cavalry]: calculateDamageForType(UnitType.cavalry),
+        [UnitType.artillery]: calculateDamageForType(UnitType.artillery)
     };
 }

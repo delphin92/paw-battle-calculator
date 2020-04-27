@@ -7,7 +7,7 @@ import {
     BattlingUnit,
     Tactic
 } from "model/battle";
-import {filterUnitsByType, getAllSubunits, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {filterUnitsByType, getAllSubunits, parties, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
 import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 import {newBattle} from "model/instances/battleInstances";
@@ -24,7 +24,8 @@ export interface BattlesState {
 }
 
 interface AddOrRemoveUnitPayload {battleIndex: number, unit: Unit}
-
+interface ChangeUnitData {battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit, value: any}
+// interface ChangeUnitData {battleIndex: number, party: Party, type: UnitType, index: number, field: keyof BattlingUnit, value: any}
 interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyUnitsDamage, brander: BattlePartyUnitsDamage}
 
 interface SetBattleTacticActionPayload {
@@ -60,6 +61,7 @@ const battles = createSlice({
                     party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
                         path: unit.path,
                         power: calculateUnitPower(unit, party[unit.type].tactic),
+                        damageDistributionCoefficient: 1,
                         takenDamage: {
                             manpowerDamage: 0,
                             moraleDamage: 0
@@ -93,6 +95,15 @@ const battles = createSlice({
         _setBattleTactic: (state, {payload: {battleIndex, party, tactic, unitType}}: PayloadAction<SetBattleTacticActionPayload>) => {
             state.battles[battleIndex][party][unitType].tactic = tactic;
         },
+        _changeUnitData:(state, {payload: {battleIndex, unit, field, value}}: PayloadAction<ChangeUnitData>) => {
+            const battlingUnit = state.battles[battleIndex][parties[unit.path[0]]][unit.type].units
+                .find(battlingUnit => unitPathsEq(battlingUnit.path, unit.path));
+
+            battlingUnit && (battlingUnit[field] = value);
+        },
+        // _changeUnitData:(state, {payload: {battleIndex, party, type, index, field, value}}: PayloadAction<ChangeUnitData>) => {
+        //     state.battles[battleIndex][party][type].units[index][field] = value;
+        // },
 
         changeUnitPower: (state, {payload: {battleIndex, unit, power}}: PayloadAction<{battleIndex: number, unit: UnitLeaf, power: number}>) => {
             const battle = state.battles[battleIndex];
@@ -149,7 +160,7 @@ const battles = createSlice({
     }
 });
 
-const {_setBattleTactic, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage} = battles.actions;
+const {_setBattleTactic, _changeUnitData, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage} = battles.actions;
 
 /****** EXPORT ******/
 
@@ -172,6 +183,11 @@ export const setBattleTactic = ({battleIndex, party, tactic, unitType}: SetBattl
         dispatch(_setBattleTactic({battleIndex, party, tactic, unitType}));
         dispatch(calculate(battleIndex));
     }
+
+export const changeUnitData = (battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit, value: any): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
+    dispatch(_changeUnitData({battleIndex, unit, field, value}));
+    dispatch(calculate(battleIndex));
+}
 
 export const changeBattleConditions = (battleIndex: number, field: keyof BattleConditions, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
     dispatch(_changeBattleConditions({battleIndex, field, value}));

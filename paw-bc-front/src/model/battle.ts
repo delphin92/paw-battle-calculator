@@ -36,6 +36,7 @@ export interface BattleParty {
 export interface BattlingUnit {
     path: UnitPath;
     power: number;
+    damageDistributionCoefficient: number;
     takenDamage: Damage;
 }
 
