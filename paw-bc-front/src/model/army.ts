@@ -38,6 +38,18 @@ export type UnitDefence = {
     };
 }
 
+export type BattleCharacteristics = {
+    [key in Tactic]?: BattleCharacteristic;
+}
+
+export interface BattleCharacteristic {
+    power: number;
+    pursuit: number;
+    disordering: number;
+    security: number;
+    calm: number;
+}
+
 interface UnitBase {
     name: string;
     commanderName?: string;
@@ -51,6 +63,7 @@ export interface UnitNode extends UnitBase {
 
 export interface UnitLeaf extends UnitBase {
     type: UnitType;
+    battleCharacteristics: BattleCharacteristics;
     power: UnitPower;
     defence: UnitDefence;
     discipline: number;

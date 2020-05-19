@@ -13,11 +13,28 @@ const army: Army = {
             subunits: [{
                 name: '13-й мушкетерский полк',
                 type: UnitType.infantry,
-                power: {
-                    [InfantryTactic.firefight]: 33
-                },
-                defence: {
-                    [InfantryTactic.firefight]: 6
+                battleCharacteristics: {
+                    [InfantryTactic.skirmish]: {
+                        power:  2,
+                        pursuit: 0,
+                        disordering: 1,
+                        security: 8,
+                        calm: 8
+                    },
+                    [InfantryTactic.defend]: {
+                        power:  20,
+                        pursuit: 0,
+                        disordering: 0,
+                        security: 6,
+                        calm: 8
+                    },
+                    [InfantryTactic.lineOffence]: {
+                        power:  15,
+                        pursuit: 8,
+                        disordering: 3,
+                        security: 4,
+                        calm: 4
+                    }
                 },
                 manpower: 2400,
                 morale: 2600

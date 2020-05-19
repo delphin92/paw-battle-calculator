@@ -7,9 +7,8 @@ export const emptyBattleParty: BattleParty = {
         infantryPower: 0,
         cavalryPower: 0,
         artilleryPower: 0,
-        cavalrySupportBonus: 0,
-        artillerySupportBonus: 0,
-        totalPower: 0
+        totalPower: 0,
+        totalPursuit: 0
     },
     report: '',
     [UnitType.infantry]: {

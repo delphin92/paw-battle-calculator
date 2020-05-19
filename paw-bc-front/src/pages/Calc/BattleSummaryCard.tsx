@@ -20,9 +20,10 @@ const BattleSummaryCard: React.FC<BattleSummaryCardProps & BattleSummaryCardStat
             <p><strong>Сила пехоты:</strong> {battleSummary.infantryPower}</p>
             <p><strong>Сила кавалерии:</strong> {battleSummary.cavalryPower}</p>
             <p><strong>Сила артиллерии:</strong> {battleSummary.artilleryPower}</p>
-            <p><strong>Бонус поддержки кавалерии:</strong> {battleSummary.cavalrySupportBonus}</p>
-            <p><strong>Бонус поддержки артиллерии:</strong> {battleSummary.artillerySupportBonus}</p>
+            {/*<p><strong>Бонус поддержки кавалерии:</strong> {battleSummary.cavalrySupportBonus}</p>*/}
+            {/*<p><strong>Бонус поддержки артиллерии:</strong> {battleSummary.artillerySupportBonus}</p>*/}
             <p><strong>Общаая сила:</strong> {battleSummary.totalPower}</p>
+            <p><strong>Общее преследование:</strong> {battleSummary.totalPursuit}</p>
         </Card.Body>
     </Card>
 );

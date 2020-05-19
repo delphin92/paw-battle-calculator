@@ -7,7 +7,17 @@ import {
     BattlingUnit,
     Tactic
 } from "model/battle";
-import {filterUnitsByType, getAllSubunits, parties, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {
+    BattleCharacteristic,
+    filterUnitsByType,
+    getAllSubunits,
+    parties,
+    Party,
+    Unit,
+    UnitLeaf,
+    unitPathsEq,
+    UnitType
+} from "model/army";
 import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 import {newBattle} from "model/instances/battleInstances";
@@ -15,7 +25,7 @@ import {
     calculateBattlePartyUnitsPower,
     calculateBattleSummary,
     calculatePartyDamage,
-    calculateUnitPower, generateReport
+    calculateUnitCharacteristic, generateReport
 } from "model/logic/battleLogic";
 
 export interface BattlesState {
@@ -24,7 +34,7 @@ export interface BattlesState {
 }
 
 interface AddOrRemoveUnitPayload {battleIndex: number, unit: Unit}
-interface ChangeUnitData {battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit, value: any}
+interface ChangeUnitData {battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit | keyof BattleCharacteristic, value: any}
 // interface ChangeUnitData {battleIndex: number, party: Party, type: UnitType, index: number, field: keyof BattlingUnit, value: any}
 interface SetTakenDamagePayload {battleIndex: number, rovania: BattlePartyUnitsDamage, brander: BattlePartyUnitsDamage}
 interface SetReportPayload {battleIndex: number, rovania: string, brander: string}
@@ -61,11 +71,12 @@ const battles = createSlice({
                 const addUnitsOfType = (type: UnitType) =>
                     party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
                         path: unit.path,
-                        power: calculateUnitPower(unit, party[unit.type].tactic),
+                        battleCharacteristic: calculateUnitCharacteristic(unit, party[unit.type].tactic),
                         damageDistributionCoefficient: 1,
                         takenDamage: {
                             manpowerDamage: 0,
-                            moraleDamage: 0
+                            moraleDamage: 0,
+                            disorder: 0
                         }
                     })));
 
@@ -100,7 +111,13 @@ const battles = createSlice({
             const battlingUnit = state.battles[battleIndex][parties[unit.path[0]]][unit.type].units
                 .find(battlingUnit => unitPathsEq(battlingUnit.path, unit.path));
 
-            battlingUnit && (battlingUnit[field] = value);
+            if (battlingUnit) {
+                if (field in battlingUnit) {
+                    battlingUnit[field as keyof BattlingUnit] = value
+                } else {
+                    battlingUnit.battleCharacteristic[field as keyof BattleCharacteristic] = value
+                }
+            }
         },
         // _changeUnitData:(state, {payload: {battleIndex, party, type, index, field, value}}: PayloadAction<ChangeUnitData>) => {
         //     state.battles[battleIndex][party][type].units[index][field] = value;
@@ -114,7 +131,7 @@ const battles = createSlice({
 
                 const stUnit = party[unit.type].units.find(battlingUnit => unitPathsEq(battlingUnit.path, unit.path)) as BattlingUnit;
 
-                stUnit.power = power;
+                stUnit.battleCharacteristic.power = power;
             }
         },
         _updateUnitsPower: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattlePartyUnitsPower, brander: BattlePartyUnitsPower}>) => {
@@ -122,11 +139,11 @@ const battles = createSlice({
 
             const setPowerForType = (type: UnitType) => {
                 battle.rovania[type].units.forEach((unit, i) =>
-                    unit.power = rovania[type][i]
+                    unit.battleCharacteristic.power = rovania[type][i]
                 );
 
                 battle.brander[type].units.forEach((unit, i) =>
-                    unit.power = brander[type][i]
+                    unit.battleCharacteristic.power = brander[type][i]
                 );
             }
 
@@ -189,7 +206,7 @@ export const setBattleTactic = ({battleIndex, party, tactic, unitType}: SetBattl
         dispatch(calculate(battleIndex));
     }
 
-export const changeUnitData = (battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit, value: any): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
+export const changeUnitData = (battleIndex: number, unit: UnitLeaf, field: keyof BattlingUnit | keyof BattleCharacteristic, value: any): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
     dispatch(_changeUnitData({battleIndex, unit, field, value}));
     dispatch(calculate(battleIndex));
 }

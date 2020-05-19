@@ -1,4 +1,4 @@
-import {UnitPath, UnitType} from "model/army";
+import {BattleCharacteristic, UnitPath, UnitType} from "model/army";
 
 export interface Battle {
     id: number;
@@ -36,14 +36,15 @@ export interface BattleParty {
 
 export interface BattlingUnit {
     path: UnitPath;
-    power: number;
+    battleCharacteristic: BattleCharacteristic;
     damageDistributionCoefficient: number;
     takenDamage: Damage;
 }
 
 export enum InfantryTactic {
     skirmish = 'Перестрелка',
-    firefight = 'Огневой бой',
+    defend = 'Оборона',
+    lineOffence = 'Наступление линией',
     columnAttack = 'Атака колоннами',
     square = 'Каре'
 }
@@ -74,9 +75,8 @@ export interface BattleSummary {
     cavalryPower: number;
     artilleryPower: number;
 
-    cavalrySupportBonus: number;
-    artillerySupportBonus: number;
     totalPower: number;
+    totalPursuit: number;
 }
 
 // export interface BattleResult {
@@ -95,6 +95,7 @@ export type BattlePartyUnitsPower = BattlePartyUnitsData<number>;
 export interface Damage {
     manpowerDamage: number;
     moraleDamage: number;
+    disorder: number;
 }
 
 export interface UnitDamage extends Damage {

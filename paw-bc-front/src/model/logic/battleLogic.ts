@@ -6,11 +6,10 @@ import {
     BattlePartyUnitsPower,
     BattleSummary,
     BattlingUnit,
-    InfantryTactic,
     Tactic,
     UnitDamage
 } from "model/battle";
-import {Armies, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
+import {Armies, BattleCharacteristic, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
 import {sumBy} from "lodash";
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {
@@ -19,29 +18,38 @@ export const isUnitInBattle = (battle: Battle, unit: Unit) => {
     return unitIndex >= 0;
 }
 
-export const getDamage = ({path, takenDamage: {moraleDamage, manpowerDamage}}: BattlingUnit): UnitDamage => ({
+export const getDamage = ({path, takenDamage: {moraleDamage, manpowerDamage, disorder}}: BattlingUnit): UnitDamage => ({
     unit: path,
     manpowerDamage,
-    moraleDamage
+    moraleDamage,
+    disorder
 })
 
-export const calculateUnitPower = (unit: UnitLeaf, tactic: Tactic): number => {
+export const calculateUnitCharacteristic = (unit: UnitLeaf, tactic: Tactic): BattleCharacteristic => {
     let numberFactor;
 
-    if (tactic === InfantryTactic.square) {
-        numberFactor = unit.morale;
-    } else if (tactic === InfantryTactic.columnAttack) {
-        numberFactor = (unit.manpower + unit.morale) / 2;
-    } else {
-        numberFactor = unit.manpower;
-    }
+    // if (tactic === InfantryTactic.square) {
+    //     numberFactor = unit.morale;
+    // } else if (tactic === InfantryTactic.columnAttack) {
+    //     numberFactor = (unit.manpower + unit.morale) / 2;
+    // } else {
+    //     numberFactor = unit.manpower;
+    // }
 
-    return (unit.power[tactic] ?? 0) / 100 * numberFactor;
+    numberFactor = Math.sqrt(unit.manpower * unit.morale);
+
+    const battleCharacteristic = unit.battleCharacteristics?.[tactic] || {} as BattleCharacteristic;
+
+    return {
+        ...battleCharacteristic,
+        power: (battleCharacteristic.power ?? 0) / 100 * numberFactor,
+        pursuit: (battleCharacteristic.pursuit ?? 0) / 100 * numberFactor
+    };
 }
 
 export const calculateBattlePartyUnitsPower = (battleParty: BattleParty, armies: Armies): BattlePartyUnitsPower => {
     const getForType = (type: UnitType) => battleParty[type].units
-            .map(unit => calculateUnitPower(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic));
+            .map(unit => calculateUnitCharacteristic(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic).power);
 
     return {
         [UnitType.infantry]: getForType(UnitType.infantry),
@@ -56,28 +64,17 @@ export const calculateBattleSummary = (battle: Battle, party: Party): BattleSumm
 
     let totalPower = 0;
 
-    const infantryPower = sumBy(battleParty[UnitType.infantry].units, unit => unit.power);
-    const cavalryPower = sumBy(battleParty[UnitType.cavalry].units, unit => unit.power);
-    const artilleryPower = sumBy(battleParty[UnitType.artillery].units, unit => unit.power);
+    const infantryPower = sumBy(battleParty[UnitType.infantry].units, unit => unit.battleCharacteristic.power);
+    const cavalryPower = sumBy(battleParty[UnitType.cavalry].units, unit => unit.battleCharacteristic.power);
+    const artilleryPower = sumBy(battleParty[UnitType.artillery].units, unit => unit.battleCharacteristic.power);
 
-    totalPower += infantryPower;
-
-    // if (battleParty[UnitType.cavalry].tactic === CavalryTactic.support) {
-    //     if (battleParty[UnitType.infantry].tactic === InfantryTactic.firefight ||
-    //         battleParty[UnitType.infantry].tactic === InfantryTactic.columnAttack) {
-
-    const enemyCavalryPower = sumBy(enemyParty[UnitType.cavalry].units, unit => unit.power);
-    const cavalrySupportBonus = (cavalryPower - enemyCavalryPower) *
-        (1 - 0.1 * battle.battleConditions.cavalryPenalty);
-    totalPower += cavalrySupportBonus
-    //     }
-    // }
+    totalPower += infantryPower + cavalryPower;
 
     let artillerySupportBonus = 0;
 
     if (battleParty[UnitType.artillery].tactic === ArtilleryTactic.support) {
         if (enemyParty[UnitType.artillery].tactic === ArtilleryTactic.artillerySuppression) {
-            const enemyArtilleryPower = sumBy(enemyParty[UnitType.artillery].units, unit => unit.power);
+            const enemyArtilleryPower = sumBy(enemyParty[UnitType.artillery].units, unit => unit.battleCharacteristic.power);
             artillerySupportBonus = artilleryPower - enemyArtilleryPower;
         } else {
             artillerySupportBonus = artilleryPower;
@@ -88,19 +85,34 @@ export const calculateBattleSummary = (battle: Battle, party: Party): BattleSumm
 
     totalPower = Math.max(totalPower, 0);
 
+    const infantryPursuit = sumBy(battleParty[UnitType.infantry].units, unit => unit.battleCharacteristic.pursuit);
+    const cavalryPursuit = sumBy(battleParty[UnitType.cavalry].units, unit => unit.battleCharacteristic.pursuit);
+    const totalPursuit = infantryPursuit + cavalryPursuit;
+
     return {
         infantryPower,
         cavalryPower,
         artilleryPower,
-        cavalrySupportBonus,
-        artillerySupportBonus,
-        totalPower
+        totalPower,
+        totalPursuit
     };
 }
 
 export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyUnitsDamage => {
     const battleParty = battle[party];
     const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
+
+    const resultRate = battleParty.battleSummary.totalPower / enemyParty.battleSummary.totalPower;
+    const successRate = resultRate > 1 ? resultRate : 1 / resultRate;
+    let damage: number;
+
+    if (resultRate > 1.2) {
+        // success
+        damage = enemyParty.battleSummary.totalPower / successRate;
+    } else {
+        damage = enemyParty.battleSummary.totalPower / successRate +
+            enemyParty.battleSummary.totalPursuit * successRate;
+    }
 
     const sumDamDistrCoeffForType = (type: UnitType) =>
         sumBy(battleParty[type].units, battlingUnit => battlingUnit.damageDistributionCoefficient);
@@ -111,11 +123,16 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
         sumDamDistrCoeffForType(UnitType.artillery);
 
     const calculateDamageForType = (type: UnitType) =>
-        battleParty[type].units.map(unit => ({
-            unit: unit.path,
-            manpowerDamage: enemyParty.battleSummary.totalPower / damDistrCoeffSum * unit.damageDistributionCoefficient,
-            moraleDamage: enemyParty.battleSummary.totalPower / damDistrCoeffSum * unit.damageDistributionCoefficient
-        }))
+        battleParty[type].units.map(unit => {
+            const damageProportion = unit.damageDistributionCoefficient / damDistrCoeffSum;
+
+            return {
+                unit: unit.path,
+                manpowerDamage: damage * damageProportion / unit.battleCharacteristic.security,
+                moraleDamage: damage * damageProportion / unit.battleCharacteristic.calm,
+                disorder: unit.battleCharacteristic.disordering / successRate
+            };
+        })
 
     return {
         [UnitType.infantry]: calculateDamageForType(UnitType.infantry),

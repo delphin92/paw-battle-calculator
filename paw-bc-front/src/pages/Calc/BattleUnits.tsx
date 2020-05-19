@@ -1,7 +1,7 @@
 import React, {ChangeEvent} from "react";
 import {BattlingUnit} from "model/battle";
 import {Button, Form, FormControl, InputGroup} from "react-bootstrap";
-import {Armies, getByPath, UnitLeaf, Unit} from "model/army";
+import {Armies, getByPath, UnitLeaf, Unit, BattleCharacteristic} from "model/army";
 import { flow } from "lodash";
 import {RootState} from "redux/rootReducer";
 import {changeUnitData, removeUnitFromBattle} from "redux/slicers/battles";
@@ -19,7 +19,7 @@ interface BattleUnitsState {
 }
 
 interface BattleUnitsDispatched {
-    changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit, value: any) => void;
+    changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit | keyof BattleCharacteristic, value: any) => void;
     removeUnitFromBattle: (unit: Unit) => void;
 }
 
@@ -28,14 +28,14 @@ const BattleUnits: React.FC<BattleUnitsProps & BattleUnitsState & BattleUnitsDis
         <Form inline className="mb-3">
             {battlingUnits.map(flow(
                 ({path, ...other}, index) => ({unit: getByPath(armies, path) as UnitLeaf, index, ...other}),
-                ({unit, power, damageDistributionCoefficient, index}) =>
+                ({unit, battleCharacteristic, damageDistributionCoefficient, index}) =>
                     <InputGroup key={index} className="unit-power-input-group" size="sm">
                         <InputGroup.Prepend>
                             <InputGroup.Text>{unit.name}</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             type="number"
-                            value={power}
+                            value={battleCharacteristic.power}
                             onChange={({target: {value}}: ChangeEvent<HTMLInputElement>) =>
                                 changeUnitData(unit, 'power', parseInt(value))
                             }
@@ -65,7 +65,7 @@ export default withRouter(connect(
         armies: state.armiesState.armies
     }),
     (dispatch, {match: {params: {battleIndex}}}: RouteComponentProps<{battleIndex: string}>) => ({
-        changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit, value: any) =>
+        changeUnitData: (unit: UnitLeaf, field: keyof BattlingUnit | keyof BattleCharacteristic, value: any) =>
             dispatch<any>(changeUnitData(parseInt(battleIndex), unit, field, value)),
         removeUnitFromBattle: (unit: Unit) => dispatch<any>(removeUnitFromBattle({unit, battleIndex: parseInt(battleIndex)}))
     })

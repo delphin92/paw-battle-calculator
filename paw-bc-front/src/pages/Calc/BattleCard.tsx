@@ -34,7 +34,8 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    onChange={setInfantryTactic}
                 >
                     <ToggleButton value={InfantryTactic.skirmish}>{InfantryTactic.skirmish}</ToggleButton>
-                    <ToggleButton value={InfantryTactic.firefight}>{InfantryTactic.firefight}</ToggleButton>
+                    <ToggleButton value={InfantryTactic.defend}>{InfantryTactic.defend}</ToggleButton>
+                    <ToggleButton value={InfantryTactic.lineOffence}>{InfantryTactic.lineOffence}</ToggleButton>
                     <ToggleButton value={InfantryTactic.columnAttack}>{InfantryTactic.columnAttack}</ToggleButton>
                     <ToggleButton value={InfantryTactic.square}>{InfantryTactic.square}</ToggleButton>
                 </ToggleButtonGroup>
