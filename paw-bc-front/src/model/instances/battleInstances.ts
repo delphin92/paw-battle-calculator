@@ -12,7 +12,7 @@ export const emptyBattleParty: BattleParty = {
     },
     report: '',
     [UnitType.infantry]: {
-        tactic: InfantryTactic.skirmish,
+        tactic: InfantryTactic.probe,
         units: [],
         totalPower: 0
     },

@@ -2,7 +2,7 @@ import {BattleCharacteristics, UnitType} from "model/army";
 import {ArtilleryTactic, CavalryTactic, InfantryTactic} from "model/battle";
 
 const genericInfantryCharacteristics: BattleCharacteristics = {
-    [InfantryTactic.skirmish]: {
+    [InfantryTactic.probe]: {
         power:  8,
         pursuit: 2,
         disordering: 0,
@@ -16,12 +16,19 @@ const genericInfantryCharacteristics: BattleCharacteristics = {
         security: 6,
         calm: 6
     },
-    [InfantryTactic.lineOffence]: {
+    [InfantryTactic.offence]: {
         power:  12,
         pursuit: 10,
         disordering: 5,
         security: 4,
         calm: 3
+    },
+    [InfantryTactic.attack]: {
+        power:  20,
+        pursuit: 150,
+        disordering: 10,
+        security: 3,
+        calm: 2
     }
 }
 
@@ -33,7 +40,7 @@ const genericCavalryCharacteristics: BattleCharacteristics = {
         security: 15,
         calm: 20
     },
-    [CavalryTactic.flanking]: {
+    [CavalryTactic.probe]: {
         power: 6,
         pursuit: 8,
         disordering: 0,

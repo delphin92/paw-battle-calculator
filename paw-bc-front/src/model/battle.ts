@@ -42,16 +42,15 @@ export interface BattlingUnit {
 }
 
 export enum InfantryTactic {
-    skirmish = 'Перестрелка',
+    probe = 'Разведка',
     defend = 'Оборона',
-    lineOffence = 'Наступление линией',
-    columnAttack = 'Атака колоннами',
-    square = 'Каре'
+    offence = 'Наступление',
+    attack = 'Атака'
 }
 
 export enum CavalryTactic {
     charge = 'Атака',
-    flanking = 'Фланкировка',
+    probe = 'Разведка',
     support = 'Поддержка'
 }
 

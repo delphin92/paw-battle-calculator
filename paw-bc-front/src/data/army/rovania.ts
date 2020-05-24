@@ -15,56 +15,12 @@ const army: Army = {
                 subunits: [{
                     name: '32 линейный полк',
                     type: UnitType.infantry,
-                    battleCharacteristics: {
-                        [InfantryTactic.skirmish]: {
-                            power:  8,
-                            pursuit: 2,
-                            disordering: 0,
-                            security: 10,
-                            calm: 10
-                        },
-                        [InfantryTactic.defend]: {
-                            power:  15,
-                            pursuit: 2,
-                            disordering: 0,
-                            security: 6,
-                            calm: 6
-                        },
-                        [InfantryTactic.lineOffence]: {
-                            power:  12,
-                            pursuit: 10,
-                            disordering: 5,
-                            security: 4,
-                            calm: 3
-                        }
-                    },
                     manpower: 1400,
                     morale: 1400
                 }, {
                     name: '23 легкий полк',
                     type: UnitType.infantry,
                     battleCharacteristics: {
-                        [InfantryTactic.skirmish]: {
-                            power:  8,
-                            pursuit: 2,
-                            disordering: 0,
-                            security: 10,
-                            calm: 10
-                        },
-                        [InfantryTactic.defend]: {
-                            power:  15,
-                            pursuit: 2,
-                            disordering: 0,
-                            security: 6,
-                            calm: 6
-                        },
-                        [InfantryTactic.lineOffence]: {
-                            power:  12,
-                            pursuit: 10,
-                            disordering: 5,
-                            security: 4,
-                            calm: 3
-                        }
                     },
                     manpower: 1400,
                     morale: 1200

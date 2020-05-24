@@ -33,11 +33,9 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.infantry].tactic}
                                    onChange={setInfantryTactic}
                 >
-                    <ToggleButton value={InfantryTactic.skirmish}>{InfantryTactic.skirmish}</ToggleButton>
-                    <ToggleButton value={InfantryTactic.defend}>{InfantryTactic.defend}</ToggleButton>
-                    <ToggleButton value={InfantryTactic.lineOffence}>{InfantryTactic.lineOffence}</ToggleButton>
-                    <ToggleButton value={InfantryTactic.columnAttack}>{InfantryTactic.columnAttack}</ToggleButton>
-                    <ToggleButton value={InfantryTactic.square}>{InfantryTactic.square}</ToggleButton>
+                    {Object.values(InfantryTactic).map(value =>
+                        <ToggleButton value={value}>{value}</ToggleButton>
+                    )}
                 </ToggleButtonGroup>
 
                 <BattleUnits battlingUnits={battleParty[UnitType.infantry].units}/>
@@ -46,9 +44,9 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.cavalry].tactic}
                                    onChange={setCavalryTactic}
                 >
-                    <ToggleButton value={CavalryTactic.support}>{CavalryTactic.support}</ToggleButton>
-                    <ToggleButton value={CavalryTactic.charge}>{CavalryTactic.charge}</ToggleButton>
-                    <ToggleButton value={CavalryTactic.flanking}>{CavalryTactic.flanking}</ToggleButton>
+                    {Object.values(CavalryTactic).map(value =>
+                        <ToggleButton value={value}>{value}</ToggleButton>
+                    )}
                 </ToggleButtonGroup>
 
                 <BattleUnits battlingUnits={battleParty[UnitType.cavalry].units}/>
@@ -57,9 +55,9 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.artillery].tactic}
                                    onChange={setArtilleryTactic}
                 >
-                    <ToggleButton value={ArtilleryTactic.support}>{ArtilleryTactic.support}</ToggleButton>
-                    <ToggleButton value={ArtilleryTactic.bombardment}>{ArtilleryTactic.bombardment}</ToggleButton>
-                    <ToggleButton value={ArtilleryTactic.artillerySuppression}>{ArtilleryTactic.artillerySuppression}</ToggleButton>
+                    {Object.values(ArtilleryTactic).map(value =>
+                        <ToggleButton value={value}>{value}</ToggleButton>
+                    )}
                 </ToggleButtonGroup>
 
                 <BattleUnits battlingUnits={battleParty[UnitType.artillery].units}/>
