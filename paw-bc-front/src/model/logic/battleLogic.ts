@@ -10,7 +10,7 @@ import {
     UnitDamage
 } from "model/battle";
 import {Armies, BattleCharacteristic, getByPath, Party, Unit, UnitLeaf, unitPathsEq, UnitType} from "model/army";
-import {sumBy} from "lodash";
+import {flatten, sumBy} from "lodash";
 
 export const isUnitInBattle = (battle: Battle, unit: Unit) => {
     const party = unit.path[0] === 0 ? battle.rovania.allBattlingUnits : battle.brander.allBattlingUnits;
@@ -93,6 +93,8 @@ export const calculateBattleSummary = (battle: Battle, party: Party): BattleSumm
         infantryPower,
         cavalryPower,
         artilleryPower,
+        infantryPursuit,
+        cavalryPursuit,
         totalPower,
         totalPursuit
     };
@@ -141,6 +143,11 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
     };
 }
 
+const decreasePrecision = (num: number): number => {
+    const exponent = Math.pow(10, Math.max(Math.floor(num).toString().length - 2, 0));
+    return Math.ceil(num / exponent) * exponent
+}
+
 export const generateReport = (battle: Battle, party: Party, armies: Armies): string => {
     const battleParty = battle[party];
     const enemy = battle[party === 'rovania' ? 'brander' : 'rovania'];
@@ -158,16 +165,28 @@ export const generateReport = (battle: Battle, party: Party, armies: Armies): st
         unit => unit.manpower
     );
 
-    // const damage = battleParty.allBattlingUnits
-    //     .map(unit => getByPath(armies, unit)).map(unit).join(', ');
+    const damage =
+        flatten([UnitType.infantry, UnitType.cavalry, UnitType.artillery].map(unitType =>
+            battleParty[unitType].units.map(unit => {
+                const damage = decreasePrecision(unit.takenDamage.manpowerDamage);
+                return damage > 10 &&
+                    `${getByPath(armies, unit.path).name} потерял приблизительно ${damage} человек`;
+            })
+        )).filter(item => item).join(', ')
+
+    const ifPresented = (unitType: UnitType) => (text: string): string =>
+        battleParty[unitType].units.length
+            ? text
+            : '';
 
     text += `Генерал ${commanderName}!\n`+
             `Вверенные мне подразделения ведут бой ${battle.place}\n` +
             `В бою участвуют: ${unitNames}\n` +
-            `Пехота производит ${battleParty[UnitType.infantry].tactic},\n` +
-            `Кавалерия производит ${battleParty[UnitType.cavalry].tactic},\n` +
-            `Артиллерия производит ${battleParty[UnitType.artillery].tactic}.\n` +
-            `Нам противостоит примерно ${enemyManpower} человек` +
+            ifPresented(UnitType.infantry)(`Пехота производит ${battleParty[UnitType.infantry].tactic},\n`) +
+            ifPresented(UnitType.cavalry)(`Кавалерия производит ${battleParty[UnitType.cavalry].tactic},\n`) +
+            ifPresented(UnitType.artillery)(`Артиллерия производит ${battleParty[UnitType.artillery].tactic}.\n`) +
+            `Нам противостоит примерно ${decreasePrecision(enemyManpower)} человек.\n` +
+            damage +
     '';
     return text;
 }

@@ -7,6 +7,8 @@ export const emptyBattleParty: BattleParty = {
         infantryPower: 0,
         cavalryPower: 0,
         artilleryPower: 0,
+        infantryPursuit: 0,
+        cavalryPursuit: 0,
         totalPower: 0,
         totalPursuit: 0
     },

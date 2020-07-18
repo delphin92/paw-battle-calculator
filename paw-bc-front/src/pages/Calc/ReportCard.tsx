@@ -2,6 +2,7 @@ import React from "react";
 import {Party} from "model/army";
 import {BattleParty} from "model/battle";
 import {Card, FormControl} from "react-bootstrap";
+import TextareaAutosize from 'react-textarea-autosize';
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 
@@ -15,9 +16,9 @@ interface ReportCardState {
 }
 
 const ReportCard: React.FC<ReportCardProps & ReportCardState> = ({battleParty}) => (
-    <Card>
+    <Card className="report-card">
         <Card.Body>
-            <FormControl as="textarea" defaultValue={battleParty.report}/>
+            <FormControl as={TextareaAutosize} defaultValue={battleParty.report}/>
         </Card.Body>
     </Card>
 );

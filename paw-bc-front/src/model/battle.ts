@@ -74,6 +74,9 @@ export interface BattleSummary {
     cavalryPower: number;
     artilleryPower: number;
 
+    infantryPursuit: number;
+    cavalryPursuit: number;
+
     totalPower: number;
     totalPursuit: number;
 }

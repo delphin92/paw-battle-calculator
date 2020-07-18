@@ -42,6 +42,13 @@ const BattleUnits: React.FC<BattleUnitsProps & BattleUnitsState & BattleUnitsDis
                         />
                         <FormControl
                             type="number"
+                            value={battleCharacteristic.pursuit}
+                            onChange={({target: {value}}: ChangeEvent<HTMLInputElement>) =>
+                                changeUnitData(unit, 'pursuit', parseInt(value))
+                            }
+                        />
+                        <FormControl
+                            type="number"
                             value={damageDistributionCoefficient}
                             onChange={({target: {value}}: ChangeEvent<HTMLInputElement>) =>
                                 changeUnitData(unit, 'damageDistributionCoefficient', parseInt(value))
