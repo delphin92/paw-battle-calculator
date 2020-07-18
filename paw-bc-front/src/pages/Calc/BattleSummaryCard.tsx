@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 import {Party} from "model/army";
 import {BattleSummary} from "model/battle";
+import {mn} from "utils";
 
 interface BattleSummaryCardProps {
     battleIndex: number;
@@ -40,10 +41,10 @@ const BattleSummaryCard: React.FC<BattleSummaryCardProps & BattleSummaryCardStat
                             <strong>{name}</strong>
                         </Col>
                         <Col xs={4}>
-                            {(power as number).toFixed(2)}
+                            {mn(power).toFixed(2)}
                         </Col>
                         <Col xs={4}>
-                            {(pursuit as number).toFixed(2)}
+                            {mn(pursuit).toFixed(2)}
                         </Col>
                     </Row>
                 )
