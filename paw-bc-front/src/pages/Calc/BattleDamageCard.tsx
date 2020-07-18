@@ -5,6 +5,7 @@ import {BattleParty} from "model/battle";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
 import BattleDamage from "pages/Calc/BattleDamage";
+import {calculateResultRate} from "model/logic/battleLogic";
 
 interface BattleDamageCardProps {
     battleIndex: number;
@@ -13,14 +14,25 @@ interface BattleDamageCardProps {
 
 interface BattleDamageCardState {
     battleParty: BattleParty;
+    resultRate: number;
 }
 
-const BattleDamageCard: React.FC<BattleDamageCardProps & BattleDamageCardState> = ({battleParty}) => (
+const BattleDamageCard: React.FC<BattleDamageCardProps & BattleDamageCardState> = ({battleParty, resultRate}) => (
     <Card>
         <Card.Header>
-            <strong>Потери</strong>
+            <strong>Результаты боя</strong>
         </Card.Header>
         <Card.Body>
+            <Row>
+                <Col xs={4}><strong>Результат</strong></Col>
+                <Col xs={8}>
+                    {!isNaN(resultRate)
+                        ? resultRate.toFixed(2)
+                        : ''
+                    }
+                </Col>
+            </Row>
+
             <Row>
                 <Col xs={4}>
                     <strong>Подразделение</strong>
@@ -42,6 +54,7 @@ const BattleDamageCard: React.FC<BattleDamageCardProps & BattleDamageCardState> 
 
 export default connect(
     (state: RootState, ownProps: BattleDamageCardProps) => ({
-        battleParty: state.battles.battles[ownProps.battleIndex][ownProps.party]
+        battleParty: state.battles.battles[ownProps.battleIndex][ownProps.party],
+        resultRate: calculateResultRate(state.battles.battles[ownProps.battleIndex], ownProps.party)
     })
 )(BattleDamageCard);

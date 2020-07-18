@@ -100,11 +100,18 @@ export const calculateBattleSummary = (battle: Battle, party: Party): BattleSumm
     };
 }
 
+export const calculateResultRate = (battle: Battle, party: Party): number => {
+    const battleParty = battle[party];
+    const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
+
+    return battleParty.battleSummary.totalPower / enemyParty.battleSummary.totalPower;
+}
+
 export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyUnitsDamage => {
     const battleParty = battle[party];
     const enemyParty = battle[party === 'rovania' ? 'brander' : 'rovania'];
 
-    const resultRate = battleParty.battleSummary.totalPower / enemyParty.battleSummary.totalPower;
+    const resultRate = calculateResultRate(battle, party);
     const successRate = resultRate > 1 ? resultRate : 1 / resultRate;
     let damage: number;
 
