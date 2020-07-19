@@ -92,7 +92,7 @@ interface BattlePartyUnitsData<Data> {
     [UnitType.artillery]: Data[];
 }
 
-export type BattlePartyUnitsPower = BattlePartyUnitsData<number>;
+export type BattlePartyUnitsCharacteristic = BattlePartyUnitsData<BattleCharacteristic>;
 
 export interface Damage {
     manpowerDamage: number;

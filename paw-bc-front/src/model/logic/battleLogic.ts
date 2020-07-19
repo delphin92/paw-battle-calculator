@@ -3,7 +3,7 @@ import {
     Battle,
     BattleParty,
     BattlePartyUnitsDamage,
-    BattlePartyUnitsPower,
+    BattlePartyUnitsCharacteristic,
     BattleSummary,
     BattlingUnit,
     Tactic,
@@ -47,9 +47,9 @@ export const calculateUnitCharacteristic = (unit: UnitLeaf, tactic: Tactic): Bat
     };
 }
 
-export const calculateBattlePartyUnitsPower = (battleParty: BattleParty, armies: Armies): BattlePartyUnitsPower => {
+export const calculateBattlePartyUnitsCharacteristic = (battleParty: BattleParty, armies: Armies): BattlePartyUnitsCharacteristic => {
     const getForType = (type: UnitType) => battleParty[type].units
-            .map(unit => calculateUnitCharacteristic(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic).power);
+            .map(unit => calculateUnitCharacteristic(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic));
 
     return {
         [UnitType.infantry]: getForType(UnitType.infantry),
@@ -115,8 +115,8 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
     const successRate = resultRate > 1 ? resultRate : 1 / resultRate;
     let damage: number;
 
-    if (resultRate > 1.2) {
-        // success
+    if (resultRate > 0.8) {
+        // success or draw
         damage = enemyParty.battleSummary.totalPower / successRate;
     } else {
         damage = enemyParty.battleSummary.totalPower / successRate +
@@ -152,7 +152,7 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
 
 const decreasePrecision = (num: number): number => {
     const exponent = Math.pow(10, Math.max(Math.floor(num).toString().length - 2, 0));
-    return Math.ceil(num / exponent) * exponent
+    return Math.round(num / exponent) * exponent
 }
 
 export const generateReport = (battle: Battle, party: Party, armies: Armies): string => {

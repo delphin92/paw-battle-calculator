@@ -2,7 +2,7 @@ import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit"
 import {
     Battle,
     BattleConditions,
-    BattlePartyUnitsDamage, BattlePartyUnitsPower,
+    BattlePartyUnitsDamage, BattlePartyUnitsCharacteristic,
     BattleSummary,
     BattlingUnit,
     Tactic
@@ -22,7 +22,7 @@ import {remove} from "lodash";
 import {RootState} from "redux/rootReducer";
 import {newBattle} from "model/instances/battleInstances";
 import {
-    calculateBattlePartyUnitsPower,
+    calculateBattlePartyUnitsCharacteristic,
     calculateBattleSummary,
     calculatePartyDamage,
     calculateUnitCharacteristic, generateReport
@@ -134,17 +134,19 @@ const battles = createSlice({
                 stUnit.battleCharacteristic.power = power;
             }
         },
-        _updateUnitsPower: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattlePartyUnitsPower, brander: BattlePartyUnitsPower}>) => {
+        _updateUnitsCharacteristic: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattlePartyUnitsCharacteristic, brander: BattlePartyUnitsCharacteristic}>) => {
             const battle = state.battles[battleIndex];
 
             const setPowerForType = (type: UnitType) => {
-                battle.rovania[type].units.forEach((unit, i) =>
-                    unit.battleCharacteristic.power = rovania[type][i]
-                );
+                battle.rovania[type].units.forEach((unit, i) => {
+                    unit.battleCharacteristic.power = rovania[type][i].power;
+                    unit.battleCharacteristic.pursuit = rovania[type][i].pursuit;
+                });
 
-                battle.brander[type].units.forEach((unit, i) =>
-                    unit.battleCharacteristic.power = brander[type][i]
-                );
+                battle.brander[type].units.forEach((unit, i) => {
+                    unit.battleCharacteristic.power = brander[type][i].power;
+                    unit.battleCharacteristic.pursuit = brander[type][i].pursuit;
+                });
             }
 
             setPowerForType(UnitType.infantry);
@@ -182,7 +184,7 @@ const battles = createSlice({
     }
 });
 
-const {_setBattleTactic, _changeUnitData, _updateUnitsPower, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage, _setReport} = battles.actions;
+const {_setBattleTactic, _changeUnitData, _updateUnitsCharacteristic, _changeBattleConditions, _updateBattleSummaries, _setTakenDamage, _setReport} = battles.actions;
 
 /****** EXPORT ******/
 
@@ -219,10 +221,10 @@ export const changeBattleConditions = (battleIndex: number, field: keyof BattleC
 const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
     let battle = getState().battles.battles[battleIndex];
 
-    dispatch(_updateUnitsPower({
+    dispatch(_updateUnitsCharacteristic({
         battleIndex,
-        rovania: calculateBattlePartyUnitsPower(battle['rovania'], getState().armiesState.armies),
-        brander: calculateBattlePartyUnitsPower(battle['brander'], getState().armiesState.armies),
+        rovania: calculateBattlePartyUnitsCharacteristic(battle['rovania'], getState().armiesState.armies),
+        brander: calculateBattlePartyUnitsCharacteristic(battle['brander'], getState().armiesState.armies),
     }));
 
     battle = getState().battles.battles[battleIndex];

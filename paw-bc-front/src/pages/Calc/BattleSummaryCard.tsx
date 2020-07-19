@@ -34,7 +34,7 @@ const BattleSummaryCard: React.FC<BattleSummaryCardProps & BattleSummaryCardStat
                     ['Пехота', battleSummary.infantryPower, battleSummary.infantryPursuit],
                     ['Кавалерия', battleSummary.cavalryPower, battleSummary.cavalryPursuit],
                     ['Артиллерия', battleSummary.artilleryPower, 0],
-                    ['Общее', battleSummary.totalPower, battleSummary.cavalryPursuit]
+                    ['Общее', battleSummary.totalPower, battleSummary.totalPursuit]
                 ].map(([name, power, pursuit], i) =>
                     <Row key={i}>
                         <Col xs={4}>

@@ -6,28 +6,28 @@ const genericInfantryCharacteristics: BattleCharacteristics = {
         power:  8,
         pursuit: 2,
         disordering: 0,
-        security: 10,
+        security: 5,
         calm: 10
     },
     [InfantryTactic.defend]: {
         power:  15,
         pursuit: 2,
         disordering: 0,
-        security: 6,
+        security: 2,
         calm: 6
     },
     [InfantryTactic.offence]: {
         power:  12,
         pursuit: 10,
         disordering: 5,
-        security: 4,
+        security: 1,
         calm: 3
     },
     [InfantryTactic.attack]: {
-        power:  20,
-        pursuit: 150,
+        power:  14,
+        pursuit: 20,
         disordering: 10,
-        security: 3,
+        security: 0.5,
         calm: 2
     }
 }

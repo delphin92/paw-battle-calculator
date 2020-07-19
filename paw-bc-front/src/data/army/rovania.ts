@@ -1,6 +1,5 @@
 import {Army, UnitType} from "model/army";
 import {prepareUnits} from "data/army/utils";
-import {ArtilleryTactic, CavalryTactic, InfantryTactic} from "model/battle";
 
 const army: Army = {
     name: 'Армия Рованской Республики',
@@ -15,15 +14,15 @@ const army: Army = {
                 subunits: [{
                     name: '32 линейный полк',
                     type: UnitType.infantry,
-                    manpower: 1400,
-                    morale: 1400
+                    manpower: 1600,
+                    morale: 1600
                 }, {
                     name: '23 легкий полк',
                     type: UnitType.infantry,
                     battleCharacteristics: {
                     },
-                    manpower: 1400,
-                    morale: 1200
+                    manpower: 1600,
+                    morale: 1400
                 }]
             }, {
                 name: '2-я пехотная бригада',
