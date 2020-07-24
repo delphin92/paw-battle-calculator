@@ -137,21 +137,23 @@ const battles = createSlice({
         _updateUnitsCharacteristic: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattlePartyUnitsCharacteristic, brander: BattlePartyUnitsCharacteristic}>) => {
             const battle = state.battles[battleIndex];
 
-            const setPowerForType = (type: UnitType) => {
-                battle.rovania[type].units.forEach((unit, i) => {
-                    unit.battleCharacteristic.power = rovania[type][i].power;
-                    unit.battleCharacteristic.pursuit = rovania[type][i].pursuit;
-                });
+            const setCharacteristicForType = (type: UnitType) => {
+                const setForParty = (party: BattlePartyUnitsCharacteristic, partyName: Party) =>
+                    battle[partyName][type].units.forEach((unit, i) => {
+                        unit.battleCharacteristic.power = party[type][i].power;
+                        unit.battleCharacteristic.pursuit = party[type][i].pursuit;
+                        unit.battleCharacteristic.security = party[type][i].security;
+                        unit.battleCharacteristic.calm = party[type][i].calm;
+                        unit.battleCharacteristic.disordering = party[type][i].disordering;
+                    });
 
-                battle.brander[type].units.forEach((unit, i) => {
-                    unit.battleCharacteristic.power = brander[type][i].power;
-                    unit.battleCharacteristic.pursuit = brander[type][i].pursuit;
-                });
+                setForParty(rovania, 'rovania');
+                setForParty(brander, 'brander');
             }
 
-            setPowerForType(UnitType.infantry);
-            setPowerForType(UnitType.cavalry);
-            setPowerForType(UnitType.artillery);
+            setCharacteristicForType(UnitType.infantry);
+            setCharacteristicForType(UnitType.cavalry);
+            setCharacteristicForType(UnitType.artillery);
         },
         _changeBattleConditions: (state, {payload: {battleIndex, field, value}}: PayloadAction<{battleIndex: number, field: keyof BattleConditions, value: number}>) => {
             state.battles[battleIndex].battleConditions[field] = value;

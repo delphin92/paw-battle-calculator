@@ -27,14 +27,15 @@ interface ArmyTreeDispatched {
 interface ArmyTreeNodeProps {
     unit: Unit;
     depth: number;
+    isInitialExpanded?: boolean;
 
     battle: Battle;
     addUnitToBattle: (unit: Unit) => void;
     removeUnitFromBattle: (unit: Unit) => void;
 }
 
-const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, ...otherProps}) => {
-    const [isExpanded, setExpanded] = useState(false);
+const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, isInitialExpanded=false, ...otherProps}) => {
+    const [isExpanded, setExpanded] = useState(isInitialExpanded);
     const {battle, addUnitToBattle, removeUnitFromBattle} = otherProps;
 
     const toggleExpanded = (e: any) => {
@@ -76,7 +77,7 @@ const ArmyTreeNode: React.FC<ArmyTreeNodeProps> = ({unit, depth, ...otherProps})
 const ArmyTree: React.FC<ArmyTreeProps & ArmyTreeState & ArmyTreeDispatched> = ({army, ...otherProps}) => (
     <ListGroup className="army-tree">
         {army.units.map((unit, index) =>
-            <ArmyTreeNode key={index} unit={unit} depth={0} {...otherProps}/>
+            <ArmyTreeNode key={index} unit={unit} depth={0} isInitialExpanded={true} {...otherProps}/>
         )}
     </ListGroup>
 );

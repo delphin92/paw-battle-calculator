@@ -10,25 +10,25 @@ const genericInfantryCharacteristics: BattleCharacteristics = {
         calm: 10
     },
     [InfantryTactic.defend]: {
-        power:  15,
-        pursuit: 2,
+        power:  10,
+        pursuit: 5,
         disordering: 0,
         security: 2,
-        calm: 6
+        calm: 2
     },
     [InfantryTactic.offence]: {
-        power:  12,
+        power:  9,
         pursuit: 10,
         disordering: 5,
         security: 1,
-        calm: 3
+        calm: 1
     },
     [InfantryTactic.attack]: {
-        power:  14,
+        power:  8,
         pursuit: 20,
         disordering: 10,
         security: 0.5,
-        calm: 2
+        calm: 0.5
     }
 }
 
@@ -37,8 +37,8 @@ const genericCavalryCharacteristics: BattleCharacteristics = {
         power: 2,
         pursuit: 10,
         disordering: 2,
-        security: 15,
-        calm: 20
+        security: 4,
+        calm: 4
     },
     [CavalryTactic.probe]: {
         power: 6,
@@ -51,32 +51,32 @@ const genericCavalryCharacteristics: BattleCharacteristics = {
         power: 10,
         pursuit: 20,
         disordering: 10,
-        security: 4,
-        calm: 2
+        security: 0.2,
+        calm: 0.2
     }
 }
 
 const genericArtilleryCharacteristics: BattleCharacteristics = {
     [ArtilleryTactic.support]: {
-        power: 10,
+        power: 40,
         pursuit: 0,
         disordering: 2,
-        security: 20,
-        calm: 20
+        security: 8,
+        calm: 8
     },
     [ArtilleryTactic.artillerySuppression]: {
-        power: 5,
+        power: 18,
         pursuit: 0,
         disordering: 0,
-        security: 50,
-        calm: 50
+        security: 16,
+        calm: 16
     },
     [ArtilleryTactic.bombardment]: {
-        power: 8,
+        power: 20,
         pursuit: 0,
         disordering: 0,
-        security: 100,
-        calm: 100
+        security: 32,
+        calm: 32
     }
 
 }

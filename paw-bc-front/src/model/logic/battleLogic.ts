@@ -54,7 +54,7 @@ export const calculateBattlePartyUnitsCharacteristic = (battleParty: BattleParty
     return {
         [UnitType.infantry]: getForType(UnitType.infantry),
         [UnitType.cavalry]: getForType(UnitType.cavalry),
-        [UnitType.artillery]: getForType(UnitType.infantry),
+        [UnitType.artillery]: getForType(UnitType.artillery)
     }
 }
 
@@ -113,15 +113,29 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
 
     const resultRate = calculateResultRate(battle, party);
     const successRate = resultRate > 1 ? resultRate : 1 / resultRate;
-    let damage: number;
+    let manpowerDamage: number;
+    let moraleDamage: number;
 
-    if (resultRate > 0.8) {
+        // tiring
+    moraleDamage = 100 / resultRate;
+
+    if (resultRate > 0.9) {
         // success or draw
-        damage = enemyParty.battleSummary.totalPower / successRate;
+        manpowerDamage = enemyParty.battleSummary.totalPower / successRate;
+
+        if (resultRate > 1.1) {
+            // success, inspiration
+            moraleDamage -= (resultRate - 1) * 100;
+        }
     } else {
-        damage = enemyParty.battleSummary.totalPower / successRate +
+        manpowerDamage = enemyParty.battleSummary.totalPower / successRate +
             enemyParty.battleSummary.totalPursuit * successRate;
+            // panic
+        moraleDamage += enemyParty.battleSummary.totalPursuit / resultRate;
     }
+
+        // fear
+    moraleDamage += manpowerDamage;
 
     const sumDamDistrCoeffForType = (type: UnitType) =>
         sumBy(battleParty[type].units, battlingUnit => battlingUnit.damageDistributionCoefficient);
@@ -131,14 +145,17 @@ export const calculatePartyDamage = (battle: Battle, party: Party): BattlePartyU
         sumDamDistrCoeffForType(UnitType.cavalry) +
         sumDamDistrCoeffForType(UnitType.artillery);
 
+    console.log(`${party} manpower damage ${manpowerDamage}`);
+    console.log(`${party} morale damage ${moraleDamage}`);
+
     const calculateDamageForType = (type: UnitType) =>
         battleParty[type].units.map(unit => {
             const damageProportion = unit.damageDistributionCoefficient / damDistrCoeffSum;
 
             return {
                 unit: unit.path,
-                manpowerDamage: damage * damageProportion / unit.battleCharacteristic.security,
-                moraleDamage: damage * damageProportion / unit.battleCharacteristic.calm,
+                manpowerDamage: manpowerDamage * damageProportion / unit.battleCharacteristic.security,
+                moraleDamage: moraleDamage * damageProportion / unit.battleCharacteristic.calm,
                 disorder: unit.battleCharacteristic.disordering / successRate
             };
         })
