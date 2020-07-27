@@ -15,7 +15,7 @@ interface BattleSummaryCardState {
     battleSummary: BattleSummary;
 }
 
-const BattleSummaryCard: React.FC<BattleSummaryCardProps & BattleSummaryCardState> = ({battleSummary}) => (
+export const BattleSummaryCard: React.FC<BattleSummaryCardState> = ({battleSummary}) => (
     <Card>
         <Card.Body>
             <Row>

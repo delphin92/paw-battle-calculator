@@ -6,9 +6,12 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import {BrowserRouter} from "react-router-dom";
 import store from "redux/store";
+import {enableMapSet} from 'immer';
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootswatch/dist/slate/bootstrap.min.css";
+
+enableMapSet();
 
 ReactDOM.render(
     <React.StrictMode>
