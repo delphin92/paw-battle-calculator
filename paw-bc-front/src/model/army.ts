@@ -28,16 +28,6 @@ export enum UnitType {
     artillery = 'Артиллерия'
 }
 
-export type UnitPower = {
-    [key in Tactic]?: number;
-}
-
-export type UnitDefence = {
-    [key in Tactic]?: number | {
-        [key in UnitType]: number
-    };
-}
-
 export type BattleCharacteristics = {
     [key in Tactic]?: BattleCharacteristic;
 }
@@ -64,9 +54,6 @@ export interface UnitNode extends UnitBase {
 export interface UnitLeaf extends UnitBase {
     type: UnitType;
     battleCharacteristics: BattleCharacteristics;
-    power: UnitPower;
-    defence: UnitDefence;
-    discipline: number;
     manpower: number;
     morale: number;
 }

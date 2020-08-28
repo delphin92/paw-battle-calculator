@@ -81,11 +81,6 @@ export interface BattleSummary {
     totalPursuit: number;
 }
 
-// export interface BattleResult {
-//     manpowerDamage: number;
-//     moraleDamage: number;
-// }
-
 interface BattlePartyUnitsData<Data> {
     [UnitType.infantry]: Data[];
     [UnitType.cavalry]: Data[];
