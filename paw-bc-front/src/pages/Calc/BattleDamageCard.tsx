@@ -17,7 +17,7 @@ interface BattleDamageCardState {
     resultRate: number;
 }
 
-const BattleDamageCard: React.FC<BattleDamageCardProps & BattleDamageCardState> = ({battleParty, resultRate}) => (
+export const BattleDamageCard: React.FC<BattleDamageCardState> = ({battleParty, resultRate}) => (
     <Card>
         <Card.Header>
             <strong>Результаты боя</strong>

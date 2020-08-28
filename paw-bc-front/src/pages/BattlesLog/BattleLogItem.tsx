@@ -1,7 +1,7 @@
 import React from "react";
 import {Battle} from "model/battle";
 import {Col, Row} from "react-bootstrap";
-import {BattleSummaryCard} from "pages/Calc/BattleSummaryCard";
+import BattleLogCard from "pages/BattlesLog/BattleLogCard";
 
 interface BattleLogItemProps {
     battle: Battle;
@@ -10,10 +10,10 @@ interface BattleLogItemProps {
 const BattleLogItem: React.FC<BattleLogItemProps> = ({battle}) => (
     <Row>
         <Col xs={6}>
-            <BattleSummaryCard battleSummary={battle.rovania.battleSummary}/>
+            <BattleLogCard battle={battle} party="rovania"/>
         </Col>
         <Col xs={6}>
-            <BattleSummaryCard battleSummary={battle.brander.battleSummary}/>
+            <BattleLogCard battle={battle} party="brander"/>
         </Col>
     </Row>
 );

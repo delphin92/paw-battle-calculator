@@ -1,5 +1,5 @@
 import React from "react";
-import {Nav} from "react-bootstrap";
+import {Accordion, Card, Nav} from "react-bootstrap";
 import {Link, RouteComponentProps} from "react-router-dom";
 import {connect} from "react-redux";
 import {RootState} from "redux/rootReducer";
@@ -24,9 +24,21 @@ const BattleLogPage: React.FC<BattleLogPageProps & BattleLogState & RouteCompone
                 )}
             </Nav>
 
-            {currentBattleLog && currentBattleLog.map((battle, i) =>
-                <BattleLogItem key={i} battle={battle}/>
-            )}
+            <Accordion>
+
+                {currentBattleLog && currentBattleLog.map((battle, i) =>
+                    <Card>
+                        <Accordion.Toggle as={Card.Header} variant="link" eventKey={i.toString()}>
+                            Эпизод {i}
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey={i.toString()}>
+                            <Card.Body>
+                                <BattleLogItem key={i} battle={battle}/>
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                )}
+            </Accordion>
         </>
     );
 };
