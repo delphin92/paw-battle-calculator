@@ -41,7 +41,14 @@ const CalcPage: React.FC<CalcPageProps & BattlesState & RouteComponentProps<{bat
                 </Nav.Item>
             </Nav>
 
-            <BattleConditionsCard battleIndex={battleIndex}/>
+            <Row>
+                <Col md={6}>
+                    <BattleConditionsCard battleIndex={battleIndex} party="rovania"/>
+                </Col>
+                <Col md={6}>
+                    <BattleConditionsCard battleIndex={battleIndex} party="brander"/>
+                </Col>
+            </Row>
 
             <Row>
                 <Col md={6}>

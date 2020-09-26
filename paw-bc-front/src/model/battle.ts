@@ -1,4 +1,4 @@
-import {BattleCharacteristic, UnitPath, UnitType} from "model/army";
+import {BattleCharacteristic, UnitPath, UnitType, Party} from "model/army";
 
 export interface Battle {
     id: number;
@@ -62,11 +62,15 @@ export enum ArtilleryTactic {
 
 export type Tactic = InfantryTactic | CavalryTactic | ArtilleryTactic;
 
-export interface BattleConditions {
+export interface PartyBattleConditions {
     defenceBonus: number;
     formationPenalty: number;
     cavalryPenalty: number;
     artilleryFactor: number;
+}
+
+export type BattleConditions = {
+    [party in Party]: PartyBattleConditions;
 }
 
 export interface BattleSummary {

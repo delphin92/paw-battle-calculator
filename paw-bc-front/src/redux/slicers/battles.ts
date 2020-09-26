@@ -1,7 +1,7 @@
 import {Action, createSlice, PayloadAction, ThunkAction} from "@reduxjs/toolkit";
 import {
     Battle,
-    BattleConditions,
+    PartyBattleConditions,
     BattlePartyUnitsDamage, BattlePartyUnitsCharacteristic,
     BattleSummary,
     BattlingUnit,
@@ -155,8 +155,8 @@ const battles = createSlice({
             setCharacteristicForType(UnitType.cavalry);
             setCharacteristicForType(UnitType.artillery);
         },
-        _changeBattleConditions: (state, {payload: {battleIndex, field, value}}: PayloadAction<{battleIndex: number, field: keyof BattleConditions, value: number}>) => {
-            state.battles[battleIndex].battleConditions[field] = value;
+        _changeBattleConditions: (state, {payload: {battleIndex, party, field, value}}: PayloadAction<{battleIndex: number, party: Party, field: keyof PartyBattleConditions, value: number}>) => {
+            state.battles[battleIndex].battleConditions[party][field] = value;
         },
         _updateBattleSummaries: (state, {payload: {battleIndex, rovania, brander}}: PayloadAction<{battleIndex: number, rovania: BattleSummary, brander: BattleSummary}>) => {
             state.battles[battleIndex].rovania.battleSummary = rovania;
@@ -215,8 +215,8 @@ export const changeUnitData = (battleIndex: number, unit: UnitLeaf, field: keyof
     dispatch(calculate(battleIndex));
 }
 
-export const changeBattleConditions = (battleIndex: number, field: keyof BattleConditions, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
-    dispatch(_changeBattleConditions({battleIndex, field, value}));
+export const changeBattleConditions = (battleIndex: number, party: Party, field: keyof PartyBattleConditions, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
+    dispatch(_changeBattleConditions({battleIndex, party, field, value}));
     dispatch(calculate(battleIndex));
 }
 

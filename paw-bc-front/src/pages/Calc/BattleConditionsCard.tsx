@@ -1,62 +1,79 @@
 import React, {ChangeEvent} from "react";
-import {Card, Form} from "react-bootstrap";
+import {Card, Col, Form, Row} from "react-bootstrap";
 import {RootState} from "redux/rootReducer";
 import {connect} from "react-redux";
-import {BattleConditions} from "model/battle";
+import {PartyBattleConditions} from "model/battle";
 import { changeBattleConditions } from "redux/slicers/battles";
 import "pages/Calc/BattleConditionsCard.scss";
+import {Party} from "model/army";
 
 interface BattleConditionsCardProps {
     battleIndex: number;
+    party: Party;
 }
 
 interface BattleConditionsCardState {
-    battleConditions: BattleConditions;
+    battleConditions: PartyBattleConditions;
 }
 
 interface BattleConditionsCardDispatched {
-    changeBattleConditions: (field: keyof BattleConditions, value: number) => void;
+    changeBattleConditions: (field: keyof PartyBattleConditions, value: number) => void;
 }
 
 type AllProps = BattleConditionsCardProps & BattleConditionsCardState & BattleConditionsCardDispatched;
 
+const LABEL_COL_SIZE = 8;
+const INPUT_COL_SIZE = 4;
+
 const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattleConditions}) => {
-    const changeField = (field: keyof BattleConditions) =>
+    const changeField = (field: keyof PartyBattleConditions) =>
         ({target: {value}}: ChangeEvent<HTMLInputElement>) =>
             changeBattleConditions(field, parseInt(value));
 
     return (
         <Card className="battle-conditions">
             <Card.Body>
-                <Form inline>
-                    <Form.Group controlId="defenceBonus">
-                        <Form.Label>Бонус защиты</Form.Label>
-                        <Form.Control type="number" size="sm"
-                                      value={battleConditions.defenceBonus}
-                                      onChange={changeField('defenceBonus')}/>
-                    </Form.Group>
+                <Form>
+                    <Row>
+                        <Col lg={6}>
+                            <Form.Group as={Row} controlId="defenceBonus">
+                                <Form.Label column="sm" sm={LABEL_COL_SIZE}>Бонус защиты</Form.Label>
+                                <Col sm={INPUT_COL_SIZE}>
+                                    <Form.Control type="number" size="sm"
+                                                  value={battleConditions.defenceBonus}
+                                                  onChange={changeField('defenceBonus')}/>
+                                </Col>
+                            </Form.Group>
 
-                    <Form.Group controlId="formationPenalty">
-                        <Form.Label>Штраф построению</Form.Label>
-                        <Form.Control type="number" size="sm"
-                                      value={battleConditions.formationPenalty}
-                                      onChange={changeField('formationPenalty')}/>
-                    </Form.Group>
+                            <Form.Group as={Row} controlId="artilleryFactor">
+                                <Form.Label column="sm" sm={LABEL_COL_SIZE}>Фактор артиллерии</Form.Label>
+                                <Col sm={INPUT_COL_SIZE}>
+                                    <Form.Control type="number" size="sm"
+                                                  value={battleConditions.artilleryFactor}
+                                                  onChange={changeField('artilleryFactor')}/>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                        <Col lg={6}>
+                            <Form.Group as={Row} controlId="formationPenalty">
+                                <Form.Label column="sm" sm={LABEL_COL_SIZE}>Штраф построению</Form.Label>
+                                <Col sm={INPUT_COL_SIZE}>
+                                    <Form.Control type="number" size="sm"
+                                                  value={battleConditions.formationPenalty}
+                                                  onChange={changeField('formationPenalty')}/>
+                                </Col>
+                            </Form.Group>
 
-                    <Form.Group controlId="cavalryPenalty">
-                        <Form.Label>Штраф кавалерии</Form.Label>
-                        <Form.Control type="number" size="sm"
-                                      value={battleConditions.cavalryPenalty}
-                                      onChange={changeField('cavalryPenalty')}/>
-                    </Form.Group>
-
-                    <Form.Group controlId="artilleryFactor">
-                        <Form.Label>Фактор артиллерии</Form.Label>
-                        <Form.Control type="number" size="sm"
-                                      value={battleConditions.artilleryFactor}
-                                      onChange={changeField('artilleryFactor')}/>
-                    </Form.Group>
-
+                            <Form.Group as={Row} controlId="cavalryPenalty">
+                                <Form.Label column="sm" sm={LABEL_COL_SIZE}>Штраф кавалерии</Form.Label>
+                                <Col sm={INPUT_COL_SIZE}>
+                                    <Form.Control type="number" size="sm"
+                                                  value={battleConditions.cavalryPenalty}
+                                                  onChange={changeField('cavalryPenalty')}/>
+                                </Col>
+                            </Form.Group>
+                        </Col>
+                    </Row>
                 </Form>
             </Card.Body>
         </Card>
@@ -64,11 +81,11 @@ const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattl
 };
 
 export default connect(
-    (state: RootState, {battleIndex}: BattleConditionsCardProps) => ({
-        battleConditions: state.battles.battles[battleIndex].battleConditions
+    (state: RootState, {battleIndex, party}: BattleConditionsCardProps) => ({
+        battleConditions: state.battles.battles[battleIndex].battleConditions[party]
     }),
-    (dispatch, {battleIndex}: BattleConditionsCardProps) => ({
-        changeBattleConditions: (field: keyof BattleConditions, value: number) =>
-            dispatch<any>(changeBattleConditions(battleIndex, field, value))
+    (dispatch, {battleIndex, party}: BattleConditionsCardProps) => ({
+        changeBattleConditions: (field: keyof PartyBattleConditions, value: number) =>
+            dispatch<any>(changeBattleConditions(battleIndex, party, field, value))
     })
 )(BattleConditionsCard);

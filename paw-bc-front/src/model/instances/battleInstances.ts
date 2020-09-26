@@ -34,10 +34,18 @@ export const newBattle = (id: number): Battle => ({
     id,
     place: 'Битва ' + id,
     battleConditions: {
-        defenceBonus: 0,
-        cavalryPenalty: 0,
-        formationPenalty: 0,
-        artilleryFactor: 0
+        rovania: {
+            defenceBonus: 0,
+            cavalryPenalty: 0,
+            formationPenalty: 0,
+            artilleryFactor: 0
+        },
+        brander: {
+            defenceBonus: 0,
+            cavalryPenalty: 0,
+            formationPenalty: 0,
+            artilleryFactor: 0
+        }
     },
     rovania: emptyBattleParty,
     brander: emptyBattleParty

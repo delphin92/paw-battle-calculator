@@ -38,6 +38,7 @@ export interface BattleCharacteristic {
     disordering: number;
     security: number;
     calm: number;
+    // flexibility: number;
 }
 
 interface UnitBase {
