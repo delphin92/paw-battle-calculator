@@ -2,10 +2,13 @@ import {
     ArtilleryTactic,
     Battle,
     BattleParty,
-    BattlePartyUnitsDamage,
     BattlePartyUnitsCharacteristic,
+    BattlePartyUnitsDamage,
     BattleSummary,
     BattlingUnit,
+    CavalryTactic,
+    InfantryTactic,
+    PartyBattleConditions,
     Tactic,
     UnitDamage
 } from "model/battle";
@@ -25,7 +28,7 @@ export const getDamage = ({path, takenDamage: {moraleDamage, manpowerDamage, dis
     disorder
 })
 
-export const calculateUnitCharacteristic = (unit: UnitLeaf, tactic: Tactic): BattleCharacteristic => {
+export const calculateUnitCharacteristic = (unit: UnitLeaf, tactic: Tactic, battleConditions: PartyBattleConditions): BattleCharacteristic => {
     let numberFactor;
 
     // if (tactic === InfantryTactic.square) {
@@ -38,18 +41,38 @@ export const calculateUnitCharacteristic = (unit: UnitLeaf, tactic: Tactic): Bat
 
     numberFactor = Math.sqrt(unit.manpower * unit.morale);
 
+    let terrainFactorPercents = 100;
+
+    if (tactic === InfantryTactic.probe || tactic === InfantryTactic.defend || tactic === CavalryTactic.probe) {
+        terrainFactorPercents += battleConditions.defenceBonus;
+    } else if (tactic === InfantryTactic.offence) {
+        terrainFactorPercents += battleConditions.formationPenalty / 2;
+    } else if (tactic === InfantryTactic.attack || tactic === CavalryTactic.charge) {
+        terrainFactorPercents -= battleConditions.formationPenalty;
+    }
+
+    if (unit.type === UnitType.cavalry) {
+        terrainFactorPercents -= battleConditions.cavalryPenalty;
+    }
+
+    if (unit.type === UnitType.artillery) {
+        terrainFactorPercents += battleConditions.artilleryFactor;
+    }
+
+    const terrainFactor = terrainFactorPercents / 100;
+
     const battleCharacteristic = unit.battleCharacteristics?.[tactic] || {} as BattleCharacteristic;
 
     return {
         ...battleCharacteristic,
-        power: (battleCharacteristic.power ?? 0) / 100 * numberFactor,
-        pursuit: (battleCharacteristic.pursuit ?? 0) / 100 * numberFactor
+        power: (battleCharacteristic.power ?? 0) / 100 * numberFactor * terrainFactor,
+        pursuit: (battleCharacteristic.pursuit ?? 0) / 100 * numberFactor * terrainFactor
     };
 }
 
-export const calculateBattlePartyUnitsCharacteristic = (battleParty: BattleParty, armies: Armies): BattlePartyUnitsCharacteristic => {
+export const calculateBattlePartyUnitsCharacteristic = (battleParty: BattleParty, armies: Armies, battleConditions: PartyBattleConditions): BattlePartyUnitsCharacteristic => {
     const getForType = (type: UnitType) => battleParty[type].units
-            .map(unit => calculateUnitCharacteristic(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic));
+            .map(unit => calculateUnitCharacteristic(getByPath(armies, unit.path) as UnitLeaf, battleParty[type].tactic, battleConditions));
 
     return {
         [UnitType.infantry]: getForType(UnitType.infantry),

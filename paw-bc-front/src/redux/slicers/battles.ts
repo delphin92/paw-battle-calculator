@@ -63,15 +63,17 @@ const battles = createSlice({
             const battle = state.battles[battleIndex];
 
             if (battle) {
-                const party = unit.path[0] === 0 ? battle.rovania : battle.brander;
+                const party = parties[unit.path[0]];
+                const battleParty = battle[party];
 
                 const allAddedUnits = getAllSubunits(unit);
-                party.allBattlingUnits.push(...allAddedUnits.map(unit => unit.path));
+                battleParty.allBattlingUnits.push(...allAddedUnits.map(unit => unit.path));
 
                 const addUnitsOfType = (type: UnitType) =>
-                    party[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
+                    battleParty[type].units.push(...filterUnitsByType(allAddedUnits, type).map(unit => ({
                         path: unit.path,
-                        battleCharacteristic: calculateUnitCharacteristic(unit, party[unit.type].tactic),
+                        battleCharacteristic: calculateUnitCharacteristic(unit, battleParty[unit.type].tactic,
+                            battle.battleConditions[party]),
                         damageDistributionCoefficient: 1,
                         takenDamage: {
                             manpowerDamage: 0,
@@ -225,8 +227,10 @@ const calculate = (battleIndex: number): ThunkAction<void, RootState, unknown, A
 
     dispatch(_updateUnitsCharacteristic({
         battleIndex,
-        rovania: calculateBattlePartyUnitsCharacteristic(battle['rovania'], getState().armiesState.armies),
-        brander: calculateBattlePartyUnitsCharacteristic(battle['brander'], getState().armiesState.armies),
+        rovania: calculateBattlePartyUnitsCharacteristic(battle.rovania, getState().armiesState.armies,
+            battle.battleConditions.rovania),
+        brander: calculateBattlePartyUnitsCharacteristic(battle.brander, getState().armiesState.armies,
+            battle.battleConditions.brander)
     }));
 
     battle = getState().battles.battles[battleIndex];
