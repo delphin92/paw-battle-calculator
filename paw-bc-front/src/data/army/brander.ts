@@ -1,6 +1,5 @@
 import {Army, UnitType} from "model/army";
 import {prepareUnits} from "data/army/utils";
-import {InfantryTactic} from "model/battle";
 
 const army: Army = {
     name: 'Армия Королевства Брандер',

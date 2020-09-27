@@ -33,8 +33,8 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.infantry].tactic}
                                    onChange={setInfantryTactic}
                 >
-                    {Object.values(InfantryTactic).map(value =>
-                        <ToggleButton value={value}>{value}</ToggleButton>
+                    {Object.values(InfantryTactic).map((value, i) =>
+                        <ToggleButton key={i} value={value}>{value}</ToggleButton>
                     )}
                 </ToggleButtonGroup>
 
@@ -44,8 +44,8 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.cavalry].tactic}
                                    onChange={setCavalryTactic}
                 >
-                    {Object.values(CavalryTactic).map(value =>
-                        <ToggleButton value={value}>{value}</ToggleButton>
+                    {Object.values(CavalryTactic).map((value, i) =>
+                        <ToggleButton key={i} value={value}>{value}</ToggleButton>
                     )}
                 </ToggleButtonGroup>
 
@@ -55,8 +55,8 @@ const BattleCard: React.FC<BattleCardProps & BattleCardState & BattleCardDispatc
                                    value={battleParty[UnitType.artillery].tactic}
                                    onChange={setArtilleryTactic}
                 >
-                    {Object.values(ArtilleryTactic).map(value =>
-                        <ToggleButton value={value}>{value}</ToggleButton>
+                    {Object.values(ArtilleryTactic).map((value, i) =>
+                        <ToggleButton key={i} value={value}>{value}</ToggleButton>
                     )}
                 </ToggleButtonGroup>
 

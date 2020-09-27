@@ -24,8 +24,6 @@ const battlesLog = createSlice({
     }
 });
 
-const {} = battlesLog.actions;
-
 /****** EXPORT ******/
 
 export const {addBattleIntoLog} = battlesLog.actions;

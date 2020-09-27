@@ -25,10 +25,12 @@ type AllProps = BattleConditionsCardProps & BattleConditionsCardState & BattleCo
 const LABEL_COL_SIZE = 8;
 const INPUT_COL_SIZE = 4;
 
-const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattleConditions}) => {
+const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattleConditions, party}) => {
     const changeField = (field: keyof PartyBattleConditions) =>
         ({target: {value}}: ChangeEvent<HTMLInputElement>) =>
             changeBattleConditions(field, parseInt(value));
+
+    const wrapId = (id: string) => `${party}-${id}`;
 
     return (
         <Card className="battle-conditions">
@@ -36,7 +38,7 @@ const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattl
                 <Form>
                     <Row>
                         <Col lg={6}>
-                            <Form.Group as={Row} controlId="defenceBonus">
+                            <Form.Group as={Row} controlId={wrapId('defenceBonus')}>
                                 <Form.Label column="sm" sm={LABEL_COL_SIZE}>Бонус защиты</Form.Label>
                                 <Col sm={INPUT_COL_SIZE}>
                                     <Form.Control type="number" size="sm"
@@ -45,7 +47,7 @@ const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattl
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="artilleryFactor">
+                            <Form.Group as={Row} controlId={wrapId('artilleryFactor')}>
                                 <Form.Label column="sm" sm={LABEL_COL_SIZE}>Фактор артиллерии</Form.Label>
                                 <Col sm={INPUT_COL_SIZE}>
                                     <Form.Control type="number" size="sm"
@@ -55,7 +57,7 @@ const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattl
                             </Form.Group>
                         </Col>
                         <Col lg={6}>
-                            <Form.Group as={Row} controlId="formationPenalty">
+                            <Form.Group as={Row} controlId={wrapId('formationPenalty')}>
                                 <Form.Label column="sm" sm={LABEL_COL_SIZE}>Штраф построению</Form.Label>
                                 <Col sm={INPUT_COL_SIZE}>
                                     <Form.Control type="number" size="sm"
@@ -64,7 +66,7 @@ const BattleConditionsCard: React.FC<AllProps> = ({battleConditions, changeBattl
                                 </Col>
                             </Form.Group>
 
-                            <Form.Group as={Row} controlId="cavalryPenalty">
+                            <Form.Group as={Row} controlId={wrapId('cavalryPenalty')}>
                                 <Form.Label column="sm" sm={LABEL_COL_SIZE}>Штраф кавалерии</Form.Label>
                                 <Col sm={INPUT_COL_SIZE}>
                                     <Form.Control type="number" size="sm"
