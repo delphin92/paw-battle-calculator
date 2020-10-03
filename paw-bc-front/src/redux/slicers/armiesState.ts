@@ -25,11 +25,20 @@ const armiesState = createSlice({
                 unit.manpower -= damage.manpowerDamage;
                 unit.morale -= damage.moraleDamage;
             });
+        },
+        _changeUnitData: (state, {payload: {unit, field, value}}: PayloadAction<{unit: UnitLeaf, field: keyof UnitLeaf, value: number}>) => {
+            const stateUnit = getByPath(state.armies, unit.path) as UnitLeaf;
+            // @ts-ignore
+            stateUnit[field] = value;
         }
     }
 });
 
-const {_takeDamage} = armiesState.actions;
+const {_takeDamage, _changeUnitData} = armiesState.actions;
+
+export const changeUnitData = (unit: UnitLeaf, field: keyof UnitLeaf, value: number): ThunkAction<void, RootState, unknown, Action<unknown>> => dispatch => {
+    dispatch(_changeUnitData({unit, field, value}));
+}
 
 export const applyBattleDamage = (battleIndex: number): ThunkAction<void, RootState, unknown, Action<unknown>> => (dispatch, getState) => {
     const battle = getState().battles.battles[battleIndex];
